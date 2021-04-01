@@ -1,0 +1,40 @@
+{
+  "name": "poll-it-backend",
+  "version": "1.0.0",
+  "description": "The REST Api for poll it",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-specifier-resolution=node server",
+    "dev": "nodemon --experimental-specifier-resolution=node server",
+    "lint": "./node_modules/.bin/eslint \"**/*.js\"",
+    "lint:fix": "./node_modules/.bin/eslint \"**/*.js\" --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aromalanil/poll-it-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aromalanil/poll-it-backend/issues"
+  },
+  "homepage": "https://github.com/aromalanil/poll-it-backend#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-node": "^4.1.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
+  }
+}
