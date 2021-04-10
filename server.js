@@ -13,14 +13,14 @@ configureEnvVariables();
 
 const app = express();
 
+// Custom HTTP Errors
+app.use(httpErrors);
+
 // Body Parsers
 app.use(express.json());
 
 // Logger
 app.use(morgan('combined'));
-
-// Custom HTTP Errors
-app.use(httpErrors);
 
 // Connecting to database
 mongoose
@@ -41,7 +41,7 @@ app.use('/api', apiRouter);
 
 // Handling Errors
 app.use(handleNotFound);
-apiRouter.use(handleServerErrors);
+app.use(handleServerErrors);
 
 // Starting server
 const PORT = process.env.PORT || 5000;
