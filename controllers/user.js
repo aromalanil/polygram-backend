@@ -19,7 +19,7 @@ export default class UserController {
     // Validating request body
     try {
       validateEmail(email, 'email', true);
-      validateName(last_name, 'last_name', true);
+      validateName(last_name, 'last_name');
       validateName(first_name, 'first_name', true);
       validatePassword(password, 'password', true);
       validateUsername(username, 'username', true);
@@ -30,13 +30,13 @@ export default class UserController {
     // Checking if user with the given email already exist
     const doesEmailExist = await User.exists({ email, verified: true });
     if (doesEmailExist) {
-      return req.conflict(`Email ID ${email} already exist`);
+      return res.conflict(`Email ID ${email} already exist`);
     }
 
     // Checking if user with the given username already exist
     const doesUsernameExist = await User.exists({ username, verified: true });
     if (doesUsernameExist) {
-      return req.conflict(`Username ${username} already exist`);
+      return res.conflict(`Username ${username} already exist`);
     }
 
     // Deleting data of users with same credentials who are not verified
@@ -59,7 +59,6 @@ export default class UserController {
     try {
       await user.save();
     } catch (err) {
-      res.json(err);
       return res.internalServerError('Error creating user');
     }
 
