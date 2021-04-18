@@ -8,7 +8,7 @@
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validateString = (data, minLength, maxLength, fieldName, isRequired = false) => {
-  if (data !== undefined) {
+  if (data !== undefined && data !== '') {
     if (typeof data !== 'string') {
       throw new Error(`${fieldName} must be of type string`);
     } else if (data.length < minLength) {
@@ -39,24 +39,14 @@ export const validateStringArray = (
   canBeEmpty = true,
   isRequired = false
 ) => {
-  if (array !== undefined) {
+  if (array !== undefined && array !== null) {
     if (!Array.isArray(array)) {
       throw new Error(`${fieldName} must be of type array`);
     }
     if (array.length !== 0) {
-      for (let i = 0; i < array.length; i++) {
-        if (typeof array[i] !== 'string') {
-          throw new Error(`Each value in ${fieldName} must be of type string`);
-        } else if (array[i].length < minLength) {
-          throw new Error(
-            `Each value in ${fieldName} should contain at least ${minLength} characters`
-          );
-        } else if (array[i].length > maxLength) {
-          throw new Error(
-            `Each value in ${fieldName} must not exceed the ${maxLength} character limit`
-          );
-        }
-      }
+      array.forEach((element) => {
+        validateString(element, minLength, maxLength, `Each value in ${fieldName}`, isRequired);
+      });
     } else if (!canBeEmpty) {
       throw new Error(`${fieldName} cannot be an empty array`);
     }
@@ -75,7 +65,7 @@ export const validateStringArray = (
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validateNumber = (data, lowerLimit, upperLimit, fieldName, isRequired = false) => {
-  if (data !== undefined) {
+  if (data !== undefined && data !== null) {
     if (typeof data !== 'number') {
       throw new Error(`${fieldName} must be of type number`);
     } else if (data < lowerLimit || data > upperLimit) {
@@ -94,7 +84,7 @@ export const validateNumber = (data, lowerLimit, upperLimit, fieldName, isRequir
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validateBoolean = (data, fieldName, isRequired = false) => {
-  if (data !== undefined) {
+  if (data !== undefined && data !== null) {
     if (typeof data !== 'boolean') {
       throw new Error(`${fieldName} must be of type boolean`);
     }
@@ -111,7 +101,7 @@ export const validateBoolean = (data, fieldName, isRequired = false) => {
  * @param {Boolean} [isRequired] Is this field required or not.
  */
 export const validateDate = (date, fieldName = 'Date', isRequired = false) => {
-  if (date !== undefined) {
+  if (date !== undefined && date !== null) {
     const dateObject = new Date(date);
     if (!(dateObject instanceof Date) || Number.isNaN(dateObject.getTime())) {
       throw new Error(`${fieldName} must be of type Date`);
@@ -137,7 +127,7 @@ export const validateDateOfBirth = (
 ) => {
   validateDate(dateOfBirth, fieldName, isRequired);
 
-  if (dateOfBirth !== undefined) {
+  if (dateOfBirth !== undefined && dateOfBirth !== null) {
     const currentDate = new Date();
     const minimumDOB = new Date();
 
@@ -162,16 +152,27 @@ export const validateDateOfBirth = (
  * @param {Boolean} [isRequired] Is this field required or not.
  */
 export const validateName = (name, fieldName = 'Name', isRequired = false) => {
-  if (name !== undefined) {
-    if (typeof name !== 'string') {
-      throw new Error(`${fieldName} must be of type string`);
-    } else if (name.length > 30) {
-      throw new Error(`${fieldName} must not exceed the 30 character limit`);
-    } else if (!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/.test(name)) {
-      throw new Error(`Invalid ${fieldName}`);
-    }
-  } else if (isRequired) {
-    throw new Error(`${fieldName} field cannot be empty`);
+  validateString(name, 3, 30, fieldName, isRequired);
+
+  if (!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/.test(name)) {
+    throw new Error(`Invalid ${fieldName}`);
+  }
+};
+
+/**
+ *
+ * A validator function to validate Username
+ * @param {String} username Username to be validated
+ * @param {String} [fieldName] Field name to be displayed in error message.
+ * @param {Boolean} [isRequired] Is this field required or not.
+ */
+export const validateUsername = (username, fieldName = 'Username', isRequired = false) => {
+  validateString(username, 4, 15, fieldName, isRequired);
+
+  if (!/[a-z0-9_-]+$/.test(username)) {
+    throw new Error(
+      `User name must only contain small letters, numbers, underscore( _ ) and hyphen( - )`
+    );
   }
 };
 
@@ -183,16 +184,10 @@ export const validateName = (name, fieldName = 'Name', isRequired = false) => {
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validateEmail = (email, fieldName = 'Email', isRequired = false) => {
-  if (email !== undefined) {
-    if (typeof email !== 'string') {
-      throw new Error(`${fieldName} must be of type string`);
-    } else if (email.length > 100) {
-      throw new Error(`${fieldName} must not exceed the 100 character limit`);
-    } else if (!/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/.test(email)) {
-      throw new Error(`Invalid ${fieldName}`);
-    }
-  } else if (isRequired) {
-    throw new Error(`${fieldName} field cannot be empty`);
+  validateString(email, 5, 50, fieldName, isRequired);
+
+  if (!/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/.test(email)) {
+    throw new Error(`Invalid ${fieldName}`);
   }
 };
 
@@ -239,22 +234,14 @@ export const validateGender = (gender, fieldName = 'Gender', isRequired = false)
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validatePassword = (password, fieldName = 'Password', isRequired = false) => {
-  if (password !== undefined) {
-    if (typeof password !== 'string') {
-      throw new Error(`${fieldName} must be of type string`);
-    } else if (password.length > 50) {
-      throw new Error(`${fieldName} must not exceed the 50 character limit`);
-    } else if (password.length < 8) {
-      throw new Error(`${fieldName} must contain at least 8 characters`);
-    } else if (password.search(/[a-z]/i) < 0) {
-      throw new Error(`${fieldName} must contain at least one letter`);
-    } else if (password.search(/[0-9]/) < 0) {
-      throw new Error(`${fieldName} must contain at least one digit`);
-    } else if (password.search(/[#?!@$ %^&*-]/) < 0) {
-      throw new Error(`${fieldName} must contain at least one special character`);
-    }
-  } else if (isRequired) {
-    throw new Error(`${fieldName} field cannot be empty`);
+  validateString(password, 8, 50, fieldName, isRequired);
+
+  if (password.search(/[a-z]/i) < 0) {
+    throw new Error(`${fieldName} must contain at least one letter`);
+  } else if (password.search(/[0-9]/) < 0) {
+    throw new Error(`${fieldName} must contain at least one digit`);
+  } else if (password.search(/[#?!@$ %^&*-]/) < 0) {
+    throw new Error(`${fieldName} must contain at least one special character`);
   }
 };
 
