@@ -160,4 +160,41 @@ export default class UserController {
     res.clearCookie('jwt');
     res.status(200).json({ message: 'Successfully Logged Out' });
   };
+
+  sendOTP = async (req, res) => {
+    const { email } = req.body;
+
+    // Validating request body
+    try {
+      validateEmail(email, 'email', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    const user = await User.findOne({ email, verified: true });
+
+    // Checking if user exist or not.
+    if (!user) {
+      return res.notFound(`User with email ${email} do no exist`);
+    }
+
+    // Creating an OTP object
+    const otp = { data: generateOTP(6), generated_at: new Date() };
+    user.otp = otp;
+
+    try {
+      await user.save();
+    } catch (err) {
+      return res.internalServerError('Error saving Details');
+    }
+
+    // Sending OTP to the user
+    try {
+      await sendOTP(otp.data, email);
+    } catch (err) {
+      return res.internalServerError('Error sending OTP');
+    }
+
+    res.status(201).json({ message: 'OTP send' });
+  };
 }
