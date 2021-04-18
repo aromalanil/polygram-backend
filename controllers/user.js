@@ -138,7 +138,7 @@ export default class UserController {
     // Comparing password
     const doesPasswordMatch = await user.comparePassword(password);
     if (!doesPasswordMatch) {
-      return res.unauthorizedRequest('Password does not match');
+      return res.unAuthorizedRequest('Password does not match');
     }
 
     // Generating JWT
@@ -153,6 +153,73 @@ export default class UserController {
     });
 
     res.status(200).json({ message: 'Successfully Logged In' });
+  };
+
+  forgotPassword = async (req, res) => {
+    const { otp, password, username } = req.body;
+
+    // Validating request body
+    try {
+      validateUsername(username, 'username', true);
+      validateString(otp, 6, 6, 'otp', true);
+      validatePassword(password, 'password', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    const user = await User.findOne({ username, verified: true });
+
+    // Checking if user exist or not.
+    if (!user) {
+      return res.notFound(`User with username ${username} do no exist`);
+    }
+
+    // Verifying the OTP
+    try {
+      user.verifyOTP(otp);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    // Expiring the OTP
+    user.expireOTP();
+
+    user.password = password;
+    try {
+      await user.save();
+    } catch (err) {
+      return res.internalServerError(`Error saving user`);
+    }
+
+    res.status(200).json({ message: 'Password changed successfully' });
+  };
+
+  changePassword = async (req, res) => {
+    const { old_password, new_password } = req.body;
+
+    // Validating request body
+    try {
+      validatePassword(old_password, 'old_password', true);
+      validatePassword(new_password, 'new_password', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    // Verifying if password matches
+    const doesPasswordMatch = await req.user.comparePassword(old_password);
+    if (!doesPasswordMatch) {
+      return res.unAuthorizedRequest('Password does not match');
+    }
+
+    // Updating user password
+    req.user.password = new_password;
+    try {
+      await req.user.save();
+    } catch (err) {
+      return res.internalServerError('Error saving Employer');
+    }
+
+    res.status(201).json({ message: 'Password changed successfully' });
   };
 
   logout = async (req, res) => {

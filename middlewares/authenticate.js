@@ -21,7 +21,7 @@ const authenticateUser = async (req, res, next) => {
   const user = await User.findOne({ username, verified: true });
   if (!user) {
     res.clearCookie('jwt'); // Logging out the user
-    return res.unauthorizedRequest('User no more exist in the database');
+    return res.unAuthorizedRequest('User no more exist in the database');
   }
 
   // Adding user to the request object
