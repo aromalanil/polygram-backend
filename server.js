@@ -20,7 +20,7 @@ app.use(httpErrors);
 
 // Body Parsers
 app.use(express.json());
-app.use(cookieParser);
+app.use(cookieParser());
 
 // Logger
 app.use(morgan('combined'));
@@ -48,4 +48,4 @@ app.use(handleServerErrors);
 
 // Starting server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, console.log(`Server running on port : ${PORT}`)); // eslint-disable-line
+app.listen(PORT, () => console.log(`Server running on port : ${PORT}`)); // eslint-disable-line
