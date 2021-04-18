@@ -154,4 +154,10 @@ export default class UserController {
 
     res.status(200).json({ message: 'Successfully Logged In' });
   };
+
+  logout = async (req, res) => {
+    // Deleting httpOnly cookie to logout cookie
+    res.clearCookie('jwt');
+    res.status(200).json({ message: 'Successfully Logged Out' });
+  };
 }
