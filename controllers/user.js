@@ -1,3 +1,5 @@
+import { OAuth2Client } from 'google-auth-library';
+
 import {
   validateName,
   validateEmail,
@@ -10,9 +12,13 @@ import User from '../models/user';
 import { sendOTP } from '../helpers/email';
 import { generateJWT } from '../helpers/jwt';
 import { getFutureDate } from '../helpers/date';
-import { generateOTP } from '../helpers/general';
+import { generateOTP, generateRandomPassword } from '../helpers/general';
 
 export default class UserController {
+  constructor() {
+    this.googleOAuthClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
+  }
+
   register = async (req, res) => {
     const { first_name, last_name, password, username, email } = req.body;
 
@@ -263,5 +269,55 @@ export default class UserController {
     }
 
     res.status(201).json({ message: 'OTP send' });
+  };
+
+  googleOAuth = async (req, res) => {
+    const { google_token } = req.body;
+
+    // Getting user details from google
+    const ticket = await this.googleOAuthClient.verifyIdToken({
+      idToken: google_token,
+      audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
+    });
+
+    const { email, given_name: first_name, family_name: last_name } = ticket.getPayload();
+
+    // Checking for existing user with given credentials
+    let user = await User.findOne({ email, verified: true });
+
+    // Creating new user if user does not exist
+    if (!user) {
+      // Generating dummy data
+      const otp = { data: generateOTP(6), generated_at: new Date(0) };
+      const password = generateRandomPassword(10);
+      user = new User({
+        otp,
+        email,
+        password,
+        last_name,
+        first_name,
+        verified: true,
+        username: Date.now().toString(),
+      });
+
+      try {
+        await user.save();
+      } catch (err) {
+        return res.internalServerError('Error creating new user');
+      }
+    }
+
+    // Generating JWT
+    const token = generateJWT(user.username);
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieExpiryDate = getFutureDate(7); // Cookie expires in 7 day
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: isProduction,
+      expires: cookieExpiryDate,
+      sameSite: isProduction ? 'Lax' : 'none',
+    });
+
+    res.status(200).json({ msg: 'Logged In Successfully' });
   };
 }

@@ -8,6 +8,7 @@ const {
   logout,
   sendOTP,
   register,
+  googleOAuth,
   changePassword,
   forgotPassword,
 } = new UserController();
@@ -18,6 +19,7 @@ userRouter.post('/login', login);
 userRouter.post('/verify', verify);
 userRouter.post('/send-otp', sendOTP);
 userRouter.post('/send-otp', sendOTP);
+userRouter.post('/auth/google', googleOAuth);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/logout', authenticateUser, logout);

@@ -1,4 +1,5 @@
 import morgan from 'morgan';
+import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
@@ -14,6 +15,9 @@ const { handleNotFound, handleServerErrors } = new ErrorController();
 configureEnvVariables();
 
 const app = express();
+
+// Enabling CORS
+app.use(cors({ credentials: true }));
 
 // Custom HTTP Errors
 app.use(httpErrors);
