@@ -1,0 +1,36 @@
+import mongoose from 'mongoose';
+
+const questionSchema = new mongoose.Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  options: {
+    type: [String],
+    required: true,
+  },
+  opinions: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Opinion',
+  },
+  topics: {
+    type: [String],
+    required: true,
+  },
+  created_at: {
+    type: Date,
+    default: () => new Date(),
+  },
+});
+
+const Question = mongoose.model('Question', questionSchema);
+export default Question;

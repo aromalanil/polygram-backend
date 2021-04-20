@@ -16,8 +16,8 @@ const userSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    email: { type: String, required: true },
     last_name: { type: String, trim: true },
+    email: { type: String, required: true },
     password: { type: String, required: true },
     bio: { type: String, trim: true },
     otp: {
@@ -33,6 +33,20 @@ const userSchema = new mongoose.Schema(
     verified: {
       type: Boolean,
       default: false,
+    },
+    followed_topics: {
+      type: [String],
+      required: true,
+    },
+    followers: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'User',
+      required: true,
+    },
+    following: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'User',
+      required: true,
     },
   },
   { toJSON: { virtuals: true } }
