@@ -3,10 +3,12 @@ import {
   validateString,
   validateMongooseId,
   validateStringArray,
+  validateBoolean,
 } from '../helpers/validation';
 
 import Topic from '../models/topic';
 import Question from '../models/question';
+import { stringToBoolean } from '../helpers/convertors';
 
 export default class QuestionController {
   findSingleQuestion = async (req, res) => {
@@ -22,6 +24,8 @@ export default class QuestionController {
     // Finding question with corresponding ID
     const question = await Question.findById(id).lean();
 
+    // TODO Calculate percentage of each option
+
     // Checking if question exist
     if (!question) {
       return res.notFound('Question does not exist');
@@ -35,30 +39,52 @@ export default class QuestionController {
 
   findQuestions = async (req, res) => {
     const { user } = req;
-    const { topic, before_id, after_id, page_size = 10 } = req.query;
+    const {
+      topic,
+      search,
+      user_id,
+      before_id,
+      after_id,
+      page_size = 10,
+      following = 'false',
+    } = req.query;
 
     // Validating request body
     try {
       validateString(topic, 2, 30, 'topic', false);
+      validateString(search, 0, 50, 'search', false);
       validateMongooseId(before_id, 'before_id', false);
       validateMongooseId(after_id, 'after_id', false);
       validateNumber(page_size, 5, 50, 'page_size', false);
+      validateMongooseId(user_id, 'user_id', false);
+      validateBoolean(stringToBoolean(following), 'following', false);
     } catch (err) {
       return res.badRequest(err.message);
     }
 
     const query = {};
 
-    // Adding topic based filter if topic exist in query
-    if (topic) {
-      query.topics = { $elemMatch: { $eq: topic } };
+    // Adding search based filter if search is provided
+    if (search) {
+      query.$text = { $search: search };
     }
-    // If no topic is provided filter will be based on user followed topics
-    else if (user) {
+
+    // Adding user following based filter if following is provided
+    if (stringToBoolean(following) && user) {
       const topicsUserFollows = user.followed_topics;
       if (topicsUserFollows.length !== 0) {
         query.topics = { $elemMatch: { $in: topicsUserFollows } };
       }
+    }
+
+    // Adding topic based filter if topic exist in query
+    if (topic) {
+      query.topics = { $elemMatch: { $eq: topic } };
+    }
+
+    // Adding user based filter if user_id is provided
+    if (user_id) {
+      query.author = user_id;
     }
 
     // If after_id is provided only include questions posted after after_id
@@ -112,5 +138,40 @@ export default class QuestionController {
     }
 
     res.status(200).json({ msg: 'Question successfully created' });
+  };
+
+  removeQuestion = async (req, res) => {
+    const { user } = req;
+    const { id } = req.params;
+
+    // Validating request body
+    try {
+      validateMongooseId(id, 'id', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    // Fetching question from database
+    const questionToDelete = await Question.findById(id);
+    if (!questionToDelete) {
+      return res.notFound('Question not found');
+    }
+
+    // Checking if the user is the author of the question
+    if (questionToDelete.author !== user._id) {
+      return res.unAuthorizedRequest("You don't have the permission to delete this question");
+    }
+
+    // Deleting question from DB
+    try {
+      await questionToDelete.delete();
+    } catch (err) {
+      return res.internalServerError('Error deleting question');
+    }
+
+    res.status(200).json({
+      msg: 'Question deleted successfully',
+      data: { question: questionToDelete },
+    });
   };
 }
