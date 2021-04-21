@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const opinionSchema = new mongoose.Schema(
   {
-    post_id: {
+    question_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question',
       required: true,
@@ -12,7 +12,7 @@ const opinionSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    data: {
+    content: {
       type: String,
       required: true,
     },
@@ -35,6 +35,8 @@ const opinionSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true } }
 );
+
+opinionSchema.index({ question_id: 1, author: 1 }, { unique: true });
 
 opinionSchema.virtual('upvote_count').get(function () {
   return this.upvotes.length;

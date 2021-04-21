@@ -13,6 +13,7 @@
     "no-console": "warn",
     "no-invalid-this": "off",
     "consistent-return": "off",
+    "object-shorthand": "off",
     "no-underscore-dangle": "off",
     "prettier/prettier": ["error"],
     "import/prefer-default-export": "off",
