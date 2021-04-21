@@ -1,7 +1,12 @@
 import Topic from '../models/topic';
 import Question from '../models/question';
 import { stringToBoolean } from '../helpers/convertors';
-import { validateBoolean, validateMongooseId, validateStringArray } from '../helpers/validation';
+import {
+  validateBoolean,
+  validateMongooseId,
+  validateString,
+  validateStringArray,
+} from '../helpers/validation';
 
 export default class TopicController {
   findSingleTopic = async (req, res) => {
@@ -29,16 +34,25 @@ export default class TopicController {
   };
 
   findTopic = async (req, res) => {
-    const { count = 'false' } = req.query;
+    const { count = 'false', search } = req.query;
 
     // Validating request body
     try {
       validateBoolean(stringToBoolean(count), 'count', false);
+      validateString(search, 0, 30, 'search', false);
     } catch (err) {
       return res.badRequest(err.message);
     }
 
-    let topicsArray = await Topic.find({}).select('name').lean();
+    const query = {};
+    if (search) {
+      if (stringToBoolean(count)) {
+        req.badRequest('Search cannot be used along with count');
+      }
+      query.name = { $regex: search, $options: 'i' };
+    }
+
+    let topicsArray = await Topic.find(query).select('name').lean();
 
     if (stringToBoolean(count)) {
       let topicsWithQuestions = await Question.aggregate([

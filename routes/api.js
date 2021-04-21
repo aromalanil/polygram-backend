@@ -2,12 +2,14 @@ import { Router } from 'express';
 
 import userRouter from './user';
 import topicRouter from './topic';
+import opinionRouter from './opinion';
 import questionRouter from './question';
 
 const apiRouter = Router();
 
 apiRouter.use('/users', userRouter);
-apiRouter.use('/questions', questionRouter);
 apiRouter.use('/topics', topicRouter);
+apiRouter.use('/opinions', opinionRouter);
+apiRouter.use('/questions', questionRouter);
 
 export default apiRouter;
