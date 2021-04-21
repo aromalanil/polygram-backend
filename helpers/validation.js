@@ -28,7 +28,8 @@ export const validateString = (data, minLength, maxLength, fieldName, isRequired
  * @param {Number} minLength Minimum length the each element in string array can have
  * @param {Number} maxLength Maximum length the each element in string array can have
  * @param {String} fieldName Field name to be displayed in error message.
- * @param {Boolean} [canBeEmpty] Whether the array can be empty or not
+ * @param {Number} [arrayMinLength] Minimum length the array must have
+ * @param {Number} [arrayMaxLength] Maximum length the array can have
  * @param {Boolean} [isRequired] Is this field required or not
  */
 export const validateStringArray = (
@@ -36,20 +37,23 @@ export const validateStringArray = (
   minLength,
   maxLength,
   fieldName,
-  canBeEmpty = true,
+  arrayMinLength,
+  arrayMaxLength,
   isRequired = false
 ) => {
   if (array !== undefined && array !== null) {
     if (!Array.isArray(array)) {
       throw new Error(`${fieldName} must be of type array`);
     }
-    if (array.length !== 0) {
-      array.forEach((element) => {
-        validateString(element, minLength, maxLength, `Each value in ${fieldName}`, isRequired);
-      });
-    } else if (!canBeEmpty) {
-      throw new Error(`${fieldName} cannot be an empty array`);
+    if (arrayMaxLength !== undefined && array.length > arrayMaxLength) {
+      throw new Error(`${fieldName} must not have more than ${arrayMaxLength} entries`);
     }
+    if (arrayMinLength !== undefined && array.length < arrayMinLength) {
+      throw new Error(`${fieldName} must have minimum ${arrayMinLength} entries`);
+    }
+    array.forEach((element) => {
+      validateString(element, minLength, maxLength, `Each value in ${fieldName}`, isRequired);
+    });
   } else if (isRequired) {
     throw new Error(`${fieldName} field cannot be empty`);
   }

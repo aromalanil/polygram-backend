@@ -8,14 +8,14 @@
     "ecmaVersion": 12
   },
   "rules": {
-    "func-names": "off",
     "camelcase": "off",
-    "no-invalid-this": "off",
+    "func-names": "off",
     "no-console": "warn",
-    "prettier/prettier": ["error"],
+    "no-invalid-this": "off",
     "consistent-return": "off",
+    "no-underscore-dangle": "off",
+    "prettier/prettier": ["error"],
     "import/prefer-default-export": "off",
-    "no-underscore-dangle": ["error", { "allowAfterThis": true }],
     "no-unused-vars": ["error", { "ignoreRestSiblings": true, "argsIgnorePattern": "next" }],
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
   }
