@@ -1,4 +1,4 @@
-import { OAuth2Client } from 'google-auth-library';
+import dotenv from 'dotenv';
 
 import {
   validateName,
@@ -12,13 +12,13 @@ import User from '../models/user';
 import { sendOTP } from '../helpers/email';
 import { generateJWT } from '../helpers/jwt';
 import { getFutureDate } from '../helpers/date';
+import { verifyGoogleIdToken } from '../helpers/oauth';
 import { generateOTP, generateRandomPassword } from '../helpers/general';
 
-export default class UserController {
-  constructor() {
-    this.googleOAuthClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
-  }
+// Configuring ENV variables
+dotenv.config();
 
+export default class UserController {
   register = async (req, res) => {
     const { first_name, last_name, password, username, email } = req.body;
 
@@ -70,7 +70,7 @@ export default class UserController {
 
     // Sending OTP to the user
     try {
-      await sendOTP(otp.data, email);
+      await sendOTP(otp.data, email, first_name);
     } catch (err) {
       return res.internalServerError('Error sending OTP');
     }
@@ -263,7 +263,7 @@ export default class UserController {
 
     // Sending OTP to the user
     try {
-      await sendOTP(otp.data, email);
+      await sendOTP(otp.data, email, user.first_name);
     } catch (err) {
       return res.internalServerError('Error sending OTP');
     }
@@ -272,13 +272,15 @@ export default class UserController {
   };
 
   googleOAuth = async (req, res) => {
-    const { google_token } = req.body;
+    const { token } = req.body;
 
     // Getting user details from google
-    const ticket = await this.googleOAuthClient.verifyIdToken({
-      idToken: google_token,
-      audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
-    });
+    let ticket;
+    try {
+      ticket = await verifyGoogleIdToken(token);
+    } catch (err) {
+      return res.badRequest('Invalid token');
+    }
 
     const { email, given_name: first_name, family_name: last_name } = ticket.getPayload();
 
@@ -308,10 +310,10 @@ export default class UserController {
     }
 
     // Generating JWT
-    const token = generateJWT(user.username);
+    const jwtToken = generateJWT(user.username);
     const isProduction = process.env.NODE_ENV === 'production';
     const cookieExpiryDate = getFutureDate(7); // Cookie expires in 7 day
-    res.cookie('jwt', token, {
+    res.cookie('jwt', jwtToken, {
       httpOnly: true,
       secure: isProduction,
       expires: cookieExpiryDate,
