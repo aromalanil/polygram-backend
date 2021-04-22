@@ -14,14 +14,14 @@ const {
 } = new UserController();
 const userRouter = Router();
 
-userRouter.post('/register', register);
+// TODO Add edit profile route
 userRouter.post('/login', login);
 userRouter.post('/verify', verify);
 userRouter.post('/send-otp', sendOTP);
-userRouter.post('/send-otp', sendOTP);
+userRouter.post('/register', register);
 userRouter.post('/auth/google', googleOAuth);
 userRouter.post('/forgot-password', forgotPassword);
-userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/logout', authenticateUser, logout);
+userRouter.post('/change-password', authenticateUser, changePassword);
 
 export default userRouter;

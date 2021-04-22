@@ -1,9 +1,9 @@
-import morgan from 'morgan';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import morgan from 'morgan';
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import { config as configureEnvVariables } from 'dotenv';
 
 import apiRouter from './routes/api';
 import httpErrors from './middlewares/http-errors';
@@ -12,7 +12,7 @@ import ErrorController from './controllers/error';
 const { handleNotFound, handleServerErrors } = new ErrorController();
 
 // Configuring ENV variables
-configureEnvVariables();
+dotenv.config();
 
 const app = express();
 

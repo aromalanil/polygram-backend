@@ -1,4 +1,8 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+// Configuring ENV variables
+dotenv.config();
 
 /**
  *
