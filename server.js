@@ -1,4 +1,3 @@
-import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import express from 'express';
@@ -6,6 +5,7 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
 import apiRouter from './routes/api';
+import cors from './middlewares/cors';
 import httpErrors from './middlewares/http-errors';
 import ErrorController from './controllers/error';
 
@@ -17,7 +17,7 @@ dotenv.config();
 const app = express();
 
 // Enabling CORS
-app.use(cors({ credentials: true }));
+app.use(cors);
 
 // Custom HTTP Errors
 app.use(httpErrors);
