@@ -8,6 +8,7 @@ const {
   logout,
   sendOTP,
   register,
+  editDetails,
   googleOAuth,
   changePassword,
   forgotPassword,
@@ -23,6 +24,7 @@ userRouter.post('/register', register);
 userRouter.post('/auth/google', googleOAuth);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/logout', authenticateUser, logout);
+userRouter.post('/edit', authenticateUser, editDetails);
 userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/profile_picture', authenticateUser, updateProfilePicture);
 

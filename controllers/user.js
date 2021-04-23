@@ -168,6 +168,32 @@ export default class UserController {
     res.status(200).json({ message: 'Successfully Logged In' });
   };
 
+  editDetails = async (req, res) => {
+    const { user } = req;
+    const { first_name, last_name, bio } = req.body;
+
+    // Validating request body
+    try {
+      validateName(last_name, 'last_name');
+      validateName(first_name, 'first_name');
+      validateString(bio, 5, 160, 'bio');
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    user.bio = bio || user.bio;
+    user.last_name = last_name || user.last_name;
+    user.first_name = first_name || user.first_name;
+
+    try {
+      await user.save();
+    } catch (err) {
+      return res.internalServerError('Error updating the details');
+    }
+
+    res.status(200).json({ msg: 'User details updated successfully' });
+  };
+
   forgotPassword = async (req, res) => {
     const { otp, password, username } = req.body;
 
