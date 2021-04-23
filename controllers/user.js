@@ -19,6 +19,18 @@ import { generateOTP, generateRandomPassword } from '../helpers/general';
 dotenv.config();
 
 export default class UserController {
+  #loginUser = (res, username) => {
+    // Generating JWT
+    const token = generateJWT(username);
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieExpiryDate = getFutureDate(7); // Cookie expires in 7 day
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: isProduction,
+      expires: cookieExpiryDate,
+    });
+  };
+
   register = async (req, res) => {
     const { first_name, last_name, password, username, email } = req.body;
 
@@ -120,7 +132,9 @@ export default class UserController {
       return res.internalServerError('Error saving the User');
     }
 
-    res.status(200).json({ message: 'Account successfully verified' });
+    this.#loginUser(res, username);
+
+    res.status(200).json({ message: 'Account verified & Logged In' });
   };
 
   login = async (req, res) => {
@@ -147,16 +161,7 @@ export default class UserController {
       return res.unAuthorizedRequest('Password does not match');
     }
 
-    // Generating JWT
-    const token = generateJWT(username);
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieExpiryDate = getFutureDate(7); // Cookie expires in 7 day
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: isProduction,
-      expires: cookieExpiryDate,
-      sameSite: isProduction ? 'Lax' : 'none',
-    });
+    this.#loginUser(res, username);
 
     res.status(200).json({ message: 'Successfully Logged In' });
   };
@@ -309,17 +314,7 @@ export default class UserController {
       }
     }
 
-    // Generating JWT
-    const jwtToken = generateJWT(user.username);
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieExpiryDate = getFutureDate(7); // Cookie expires in 7 day
-    res.cookie('jwt', jwtToken, {
-      httpOnly: true,
-      secure: isProduction,
-      expires: cookieExpiryDate,
-      sameSite: isProduction ? 'Lax' : 'none',
-    });
-
+    this.#loginUser(res, user.username);
     res.status(200).json({ msg: 'Logged In Successfully' });
   };
 }
