@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import {
   validateName,
   validateEmail,
+  validateImage,
   validateString,
   validateUsername,
   validatePassword,
@@ -13,6 +14,7 @@ import { sendOTP } from '../helpers/email';
 import { generateJWT } from '../helpers/jwt';
 import { getFutureDate } from '../helpers/date';
 import { verifyGoogleIdToken } from '../helpers/oauth';
+import { uploadProfilePicture } from '../helpers/image';
 import { generateOTP, generateRandomPassword } from '../helpers/general';
 
 // Configuring ENV variables
@@ -287,7 +289,12 @@ export default class UserController {
       return res.badRequest('Invalid token');
     }
 
-    const { email, given_name: first_name, family_name: last_name } = ticket.getPayload();
+    const {
+      email,
+      given_name: first_name,
+      family_name: last_name,
+      picture: profile_picture,
+    } = ticket.getPayload();
 
     // Checking for existing user with given credentials
     let user = await User.findOne({ email, verified: true });
@@ -304,6 +311,7 @@ export default class UserController {
         last_name,
         first_name,
         verified: true,
+        profile_picture,
         username: Date.now().toString(),
       });
 
@@ -316,5 +324,29 @@ export default class UserController {
 
     this.#loginUser(res, user.username);
     res.status(200).json({ msg: 'Logged In Successfully' });
+  };
+
+  updateProfilePicture = async (req, res) => {
+    const { user } = req;
+    const { image } = req.body;
+
+    // Validating request body
+    try {
+      validateImage(image, 800, 125000, 'image', false);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    const image_url = await uploadProfilePicture(image, user.username);
+
+    try {
+      await User.findByIdAndUpdate(user._id, {
+        $set: { profile_picture: image_url },
+      });
+    } catch (err) {
+      res.internalServerError('Error updating the profile_picture');
+    }
+
+    res.status(201).json({ msg: 'Profile picture updated successfully' });
   };
 }

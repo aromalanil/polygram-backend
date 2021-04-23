@@ -11,6 +11,7 @@ const {
   googleOAuth,
   changePassword,
   forgotPassword,
+  updateProfilePicture,
 } = new UserController();
 const userRouter = Router();
 
@@ -23,5 +24,6 @@ userRouter.post('/auth/google', googleOAuth);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/logout', authenticateUser, logout);
 userRouter.post('/change-password', authenticateUser, changePassword);
+userRouter.post('/profile_picture', authenticateUser, updateProfilePicture);
 
 export default userRouter;

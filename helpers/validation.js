@@ -1,3 +1,5 @@
+import { calculateImageSize } from './general';
+
 /**
  *
  * A validator function to validate any string using character limit
@@ -265,5 +267,34 @@ export const validateMongooseId = (id, fieldName = 'Id', isRequired = false) => 
     }
   } else if (isRequired) {
     throw new Error(`${fieldName} field cannot be empty`);
+  }
+};
+
+/**
+ *
+ * A validator function to validate Image
+ * @param {String} Image Image to be validated in base64 format
+ * @param {Number} minimumSize Minimum size of the image in bytes
+ * @param {Number} maximumSize Maximum size of the image in bytes
+ * @param {String} [fieldName] Field name to be displayed in error message.
+ * @param {Boolean} [isRequired] Is this field required or not
+ */
+export const validateImage = (
+  image,
+  minimumSize,
+  maximumSize,
+  fieldName = 'Image',
+  isRequired = false
+) => {
+  validateString(image, 1, Infinity, 'image', isRequired);
+  if (!/(image\/jpg|image\/png|image\/jpeg)/.test(image)) {
+    throw new Error(`${fieldName} only supports png,jpeg & jpg`);
+  }
+  const imageSize = calculateImageSize(image);
+  if (imageSize < minimumSize) {
+    throw new Error(`${fieldName} should not be smaller than ${minimumSize / 1024}KB`);
+  }
+  if (imageSize > maximumSize) {
+    throw new Error(`${fieldName} should not be larger than ${maximumSize / 1024}KB`);
   }
 };

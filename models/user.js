@@ -1,6 +1,11 @@
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { getMinutesBefore } from '../helpers/date';
+import { getRandomAvatarURL } from '../helpers/image';
+
+// Configuring ENV variables
+dotenv.config();
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,6 +25,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     bio: { type: String, trim: true },
+    profile_picture: String,
     otp: {
       data: {
         type: String,
@@ -81,6 +87,10 @@ userSchema.methods.comparePassword = async function (password) {
 async function userSchemaPreSave() {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 8);
+  }
+
+  if (!this.profile_picture) {
+    this.profile_picture = getRandomAvatarURL(this.first_name);
   }
 }
 
