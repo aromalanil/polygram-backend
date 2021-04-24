@@ -168,6 +168,27 @@ export default class UserController {
     res.status(200).json({ message: 'Successfully Logged In' });
   };
 
+  findUser = async (req, res) => {
+    const { username } = req.params;
+
+    // Validating request body
+    try {
+      validateUsername(username, 'username', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    const user = await User.findOne({ username, verified: true })
+      .select('-password -__v -otp -verified')
+      .lean();
+
+    if (!user) {
+      return res.notFound('User not found');
+    }
+
+    res.status(200).json({ msg: 'User Found', data: { user } });
+  };
+
   editDetails = async (req, res) => {
     const { user } = req;
     const { first_name, last_name, bio } = req.body;

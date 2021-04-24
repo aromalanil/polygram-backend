@@ -7,6 +7,7 @@ const {
   verify,
   logout,
   sendOTP,
+  findUser,
   register,
   editDetails,
   googleOAuth,
@@ -16,10 +17,10 @@ const {
 } = new UserController();
 const userRouter = Router();
 
-// TODO Add edit profile route
 userRouter.post('/login', login);
 userRouter.post('/verify', verify);
 userRouter.post('/send-otp', sendOTP);
+userRouter.get('/:username', findUser);
 userRouter.post('/register', register);
 userRouter.post('/auth/google', googleOAuth);
 userRouter.post('/forgot-password', forgotPassword);
