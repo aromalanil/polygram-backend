@@ -18,10 +18,6 @@ const questionSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
-  opinions: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Opinion',
-  },
   topics: {
     type: [String],
     required: true,
