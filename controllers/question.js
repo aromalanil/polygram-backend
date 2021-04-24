@@ -26,7 +26,10 @@ export default class QuestionController {
     }
 
     // Finding question with corresponding ID
-    const question = await Question.findById(id).lean();
+    const question = await Question.findById(id)
+      .populate('author', 'first_name last_name username')
+      .select('-__v')
+      .lean();
 
     // Checking if question exist
     if (!question) {
@@ -68,7 +71,7 @@ export default class QuestionController {
 
     res.status(200).json({
       msg: 'Question Found',
-      question,
+      data: { question },
     });
   };
 
@@ -129,7 +132,12 @@ export default class QuestionController {
       query._id = { $gt: before_id };
     }
 
-    const questions = await Question.find(query).sort({ _id: 'descending' }).limit(page_size);
+    const questions = await Question.find(query)
+      .sort({ _id: 'descending' })
+      .populate('author', 'first_name last_name username')
+      .limit(page_size)
+      .select('-__v')
+      .lean();
 
     res.status(200).json({
       msg: 'Questions found',

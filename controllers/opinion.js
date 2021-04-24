@@ -139,12 +139,25 @@ export default class OpinionController {
       });
     }
 
+    const authorFieldsToExclude = [
+      'author.__v',
+      'author._id',
+      'author.verified',
+      'author.followed_topics',
+      'author.otp',
+      'author.password',
+      'author.email',
+    ];
+
     const opinions = await Opinion.aggregate([
       { $match: query },
       { $sort: { _id: -1 } },
       { $limit: page_size },
       ...addFieldQuery,
+      { $lookup: { from: 'users', localField: 'author', foreignField: '_id', as: 'author' } },
+      { $unset: [...authorFieldsToExclude, 'upvotes', 'downvotes', '__v'] },
     ]);
+
     res.status(200).json({ msg: 'Opinions Found', opinions });
   };
 
