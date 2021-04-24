@@ -216,13 +216,13 @@ export default class UserController {
   };
 
   forgotPassword = async (req, res) => {
-    const { otp, password, username } = req.body;
+    const { otp, new_password, username } = req.body;
 
     // Validating request body
     try {
       validateUsername(username, 'username', true);
       validateString(otp, 6, 6, 'otp', true);
-      validatePassword(password, 'password', true);
+      validatePassword(new_password, 'new_password', true);
     } catch (err) {
       return res.badRequest(err.message);
     }
@@ -244,7 +244,7 @@ export default class UserController {
     // Expiring the OTP
     user.expireOTP();
 
-    user.password = password;
+    user.password = new_password;
     try {
       await user.save();
     } catch (err) {
