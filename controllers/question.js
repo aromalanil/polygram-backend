@@ -1,14 +1,18 @@
+import mongoose from 'mongoose';
+
 import {
   validateNumber,
   validateString,
+  validateBoolean,
   validateMongooseId,
   validateStringArray,
-  validateBoolean,
 } from '../helpers/validation';
 
 import Topic from '../models/topic';
+import Opinion from '../models/opinion';
 import Question from '../models/question';
 import { stringToBoolean } from '../helpers/convertors';
+import { calculatePercentage } from '../helpers/general';
 
 export default class QuestionController {
   findSingleQuestion = async (req, res) => {
@@ -24,12 +28,43 @@ export default class QuestionController {
     // Finding question with corresponding ID
     const question = await Question.findById(id).lean();
 
-    // TODO Calculate percentage of each option
-
     // Checking if question exist
     if (!question) {
       return res.notFound('Question does not exist');
     }
+
+    const question_id = mongoose.Types.ObjectId(id);
+
+    const optionsWithWeightage = await Opinion.aggregate([
+      { $match: { question_id } },
+      {
+        $addFields: {
+          upvoteDownvoteDifference: {
+            $subtract: [{ $size: '$upvotes' }, { $size: '$downvotes' }],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$option',
+          weightage: { $sum: '$upvoteDownvoteDifference' },
+        },
+      },
+      { $project: { _id: 0, weightage: 1, option: '$_id' } },
+    ]);
+
+    const optionsWithPercentage = findPercentageFromWeightage(optionsWithWeightage);
+
+    // Adding options without opinions to array with percentage 0
+    question.options = question.options.map((option) => {
+      const optionWithPercentage = optionsWithPercentage.find(
+        (optionObject) => optionObject.option === option
+      );
+
+      if (optionWithPercentage) return optionWithPercentage;
+
+      return { option, percentage: 0 };
+    });
 
     res.status(200).json({
       msg: 'Question Found',
@@ -174,4 +209,29 @@ export default class QuestionController {
       data: { question: questionToDelete },
     });
   };
+}
+
+function findPercentageFromWeightage(optionArray) {
+  if (optionArray.length === 0) return [];
+  const weightageArray = optionArray.map((optionObject) => optionObject.weightage);
+  const maxWeightage = Math.max(...weightageArray);
+  const minWeightage = Math.min(...weightageArray);
+
+  const shiftUnits = Math.abs(maxWeightage) + Math.abs(minWeightage);
+
+  // Shifting the weightage of each option by shiftUnit
+  const modifiedOptionArray = optionArray.map((optionObject) => ({
+    ...optionObject,
+    weightage: optionObject.weightage + shiftUnits,
+  }));
+
+  let weightageSum = 0;
+  modifiedOptionArray.forEach((optionObject) => {
+    weightageSum = optionObject.weightage + weightageSum;
+  });
+
+  return modifiedOptionArray.map((optionObject) => ({
+    option: optionObject.option,
+    percentage: calculatePercentage(optionObject.weightage, weightageSum),
+  }));
 }

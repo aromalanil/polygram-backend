@@ -41,3 +41,11 @@ export const calculateImageSize = (base64String) => {
  * @returns Random value from the array
  */
 export const getRandomValueFromArray = (array) => array[Math.floor(Math.random() * array.length)];
+
+/**
+ * Function to calculate percentage
+ * @param {Number} part The part
+ * @param {Number} whole the whole
+ * @returns Calculated percentage
+ */
+export const calculatePercentage = (part, whole) => (part / whole) * 100;
