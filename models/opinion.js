@@ -44,9 +44,6 @@ opinionSchema.virtual('upvote_count').get(function () {
 opinionSchema.virtual('downvote_count').get(function () {
   return this.downvotes.length;
 });
-opinionSchema.virtual('upvote_downvote_difference').get(function () {
-  return this.upvotes.length - this.downvotes.length;
-});
 
 const Opinion = mongoose.model('Opinion', opinionSchema);
 export default Opinion;
