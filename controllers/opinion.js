@@ -165,14 +165,16 @@ export default class OpinionController {
       req.notFound('Opinion not found');
     }
 
+    const loggedInUserID = user._id.toString();
+
     // Adding user id to upvote array of opinion
-    opinion.upvotes = [...new Set([...opinion.upvotes, user._id])];
+    opinion.upvotes = [...new Set([...opinion.upvotes, loggedInUserID])];
 
     // Removing user's downvote from array if present
-    opinion.downvotes = opinion.downvotes.filter((userId) => userId !== user._id);
+    opinion.downvotes = opinion.downvotes.filter((userId) => userId !== loggedInUserID);
 
     try {
-      await user.save();
+      await opinion.save();
     } catch (err) {
       res.internalServerError('Upvote failed');
     }
@@ -188,7 +190,7 @@ export default class OpinionController {
 
   addDownvote = async (req, res) => {
     const { user } = req;
-    const { id } = req.body;
+    const { id } = req.params;
 
     // Validating request body
     try {
@@ -203,16 +205,18 @@ export default class OpinionController {
       req.notFound('Opinion not found');
     }
 
+    const loggedInUserID = user._id.toString();
+
     // Adding user id to downvote array of opinion
-    opinion.downvotes = [...new Set([...opinion.downvotes, user._id])];
+    opinion.downvotes = [...new Set([...opinion.downvotes, loggedInUserID])];
 
     // Removing user's upvote from array if present
-    opinion.upvotes = opinion.upvotes.filter((userId) => userId !== user._id);
+    opinion.upvotes = opinion.upvotes.filter((userId) => userId !== loggedInUserID);
 
     try {
-      await user.save();
+      await opinion.save();
     } catch (err) {
-      res.internalServerError('Upvote failed');
+      res.internalServerError('Downvote failed');
     }
 
     res.status(201).json({
@@ -226,7 +230,7 @@ export default class OpinionController {
 
   removeUpvote = async (req, res) => {
     const { user } = req;
-    const { id } = req.body;
+    const { id } = req.params;
 
     // Validating request body
     try {
@@ -241,13 +245,16 @@ export default class OpinionController {
       req.notFound('Opinion not found');
     }
 
+    const loggedInUserID = user._id.toString();
+
     // Removing user's upvote from array if present
-    opinion.upvotes = opinion.upvotes.filter((userId) => userId !== user._id);
+    opinion.upvotes = opinion.upvotes.filter((userId) => userId !== loggedInUserID);
 
     try {
-      await user.save();
+      opinion.markModified('upvotes');
+      await opinion.save();
     } catch (err) {
-      res.internalServerError('Upvote failed');
+      res.internalServerError('Removing upvote failed');
     }
 
     res.status(201).json({
@@ -260,7 +267,7 @@ export default class OpinionController {
 
   removeDownvote = async (req, res) => {
     const { user } = req;
-    const { id } = req.body;
+    const { id } = req.params;
 
     // Validating request body
     try {
@@ -275,13 +282,15 @@ export default class OpinionController {
       req.notFound('Opinion not found');
     }
 
+    const loggedInUserID = user._id.toString();
+
     // Removing user's downvote from array if present
-    opinion.downvotes = opinion.downvotes.filter((userId) => userId !== user._id);
+    opinion.downvotes = opinion.downvotes.filter((userId) => userId !== loggedInUserID);
 
     try {
-      await user.save();
+      await opinion.save();
     } catch (err) {
-      res.internalServerError('Upvote failed');
+      res.internalServerError('Removing downvote failed');
     }
 
     res.status(201).json({
