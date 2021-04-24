@@ -193,7 +193,7 @@ export default class QuestionController {
     }
 
     // Checking if the user is the author of the question
-    if (questionToDelete.author !== user._id) {
+    if (!questionToDelete.author.equals(user._id)) {
       return res.unAuthorizedRequest("You don't have the permission to delete this question");
     }
 
@@ -204,10 +204,7 @@ export default class QuestionController {
       return res.internalServerError('Error deleting question');
     }
 
-    res.status(200).json({
-      msg: 'Question deleted successfully',
-      data: { question: questionToDelete },
-    });
+    res.status(200).json({ msg: 'Question deleted successfully' });
   };
 }
 
