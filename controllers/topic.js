@@ -20,7 +20,7 @@ export default class TopicController {
     }
 
     // Finding topic with corresponding ID
-    const topic = await Topic.findById(id).lean();
+    const topic = await Topic.findById(id).select('-__v').lean();
 
     // Checking if topic exist
     if (!topic) {
@@ -29,7 +29,7 @@ export default class TopicController {
 
     res.status(200).json({
       msg: 'Topic Found',
-      topic,
+      data: { topic },
     });
   };
 
@@ -47,7 +47,7 @@ export default class TopicController {
     const query = {};
     if (search) {
       if (stringToBoolean(count)) {
-        req.badRequest('Search cannot be used along with count');
+        return res.badRequest('Search cannot be used along with count');
       }
       query.name = { $regex: search, $options: 'i' };
     }
@@ -94,7 +94,8 @@ export default class TopicController {
     }
 
     res.status(200).json({
-      topics: topicsArray,
+      msg: 'Topics Found',
+      data: { topics: topicsArray },
     });
   };
 
