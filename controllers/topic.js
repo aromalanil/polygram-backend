@@ -1,10 +1,11 @@
 import Topic from '../models/topic';
 import Question from '../models/question';
 import { stringToBoolean } from '../helpers/convertors';
+
 import {
+  validateString,
   validateBoolean,
   validateMongooseId,
-  validateString,
   validateStringArray,
 } from '../helpers/validation';
 

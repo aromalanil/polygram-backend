@@ -14,9 +14,8 @@ import { generateOtpHTMLTemplate, generateOtpTextTemplate } from './template';
  * @param {String} subject Subject of the otp
  * @param {String} textContent Content of the email as plain text
  * @param {String} htmlContent Content of the email as HTML
- * @returns
  */
-const sendEmail = async (emailID, subject, textContent, htmlContent) => {
+export const sendEmail = async (emailID, subject, textContent, htmlContent) => {
   const accessToken = await googleOAuthClient.getAccessToken();
 
   const transporter = createTransport({
@@ -44,17 +43,15 @@ const sendEmail = async (emailID, subject, textContent, htmlContent) => {
 
 /**
  *
- * Function to send OTP as email to a given mobile number.
+ * Function to send OTP as email to a given email address.
  * @param {String|Number} otp OTP to be send
  * @param {String} email Email to which the OTP is to be send
  * @param {String} name Name of the user
  */
-const sendOTP = async (otp, email, name) => {
+export const sendOTP = async (otp, email, name) => {
   const subject = 'One Time Password';
   const textContent = generateOtpTextTemplate(otp, name);
   const htmlContent = generateOtpHTMLTemplate(otp, name);
 
   await sendEmail(email, subject, textContent, htmlContent);
 };
-
-export { sendOTP, sendEmail };

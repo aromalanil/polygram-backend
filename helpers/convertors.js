@@ -4,7 +4,7 @@
  * @param {String} data String which is to be converted to Boolean
  * @return {Boolean} Resultant Boolean
  */
-const stringToBoolean = (data) => {
+export const stringToBoolean = (data) => {
   switch (data) {
     case 'false':
     case '0':
@@ -18,5 +18,3 @@ const stringToBoolean = (data) => {
       throw new Error('Invalid Boolean');
   }
 };
-
-export { stringToBoolean };
