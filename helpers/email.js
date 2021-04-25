@@ -48,10 +48,10 @@ export const sendEmail = async (emailID, subject, textContent, htmlContent) => {
  * @param {String} email Email to which the OTP is to be send
  * @param {String} name Name of the user
  */
-export const sendOTP = async (otp, email, name) => {
+export const sendOTP = (otp, email, name) => {
   const subject = 'One Time Password';
   const textContent = generateOtpTextTemplate(otp, name);
   const htmlContent = generateOtpHTMLTemplate(otp, name);
 
-  await sendEmail(email, subject, textContent, htmlContent);
+  return sendEmail(email, subject, textContent, htmlContent);
 };
