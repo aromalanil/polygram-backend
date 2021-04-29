@@ -1,5 +1,5 @@
 {
-  "name": "poll-it-backend",
+  "name": "poly-backend",
   "version": "1.0.0",
   "description": "The REST Api for poll it",
   "main": "server.js",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aromalanil/poll-it-backend.git"
+    "url": "git+https://github.com/aromalanil/poly-backend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aromalanil/poll-it-backend/issues"
+    "url": "https://github.com/aromalanil/poly-backend/issues"
   },
-  "homepage": "https://github.com/aromalanil/poll-it-backend#readme",
+  "homepage": "https://github.com/aromalanil/poly-backend#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
