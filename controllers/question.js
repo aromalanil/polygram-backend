@@ -205,11 +205,24 @@ export default class QuestionController {
       return res.unAuthorizedRequest("You don't have the permission to delete this question");
     }
 
-    // Deleting question from DB
+    // Starting a transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    // Deleting question & all opinions on that question from DB
+    const updates = [
+      questionToDelete.delete({ session }),
+      Opinion.deleteMany({ question_id: id }, { session }),
+    ];
+
     try {
-      await questionToDelete.delete();
+      await Promise.all(updates);
+      await session.commitTransaction();
     } catch (err) {
+      await session.abortTransaction();
       return res.internalServerError('Error deleting question');
+    } finally {
+      session.endSession();
     }
 
     res.status(200).json({ msg: 'Question deleted successfully' });
