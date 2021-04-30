@@ -20,7 +20,7 @@ export default class OpinionController {
     // Check if user have already posted an opinion
     const doesOpinionOfUserExist = await Opinion.exists({ question_id, author: user._id });
     if (doesOpinionOfUserExist) {
-      return req.conflict('User can only post single opinion for a question');
+      return res.conflict('User can only post single opinion for a question');
     }
 
     // Finding question with corresponding ID
