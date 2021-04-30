@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const pictureSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true,
   },
   type: {
     type: String,
