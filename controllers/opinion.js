@@ -117,24 +117,8 @@ export default class OpinionController {
     if (user) {
       addFieldQuery.push({
         $addFields: {
-          is_upvoted: {
-            $function: {
-              body: function (array, element) {
-                return array.includes(element);
-              },
-              args: ['$upvotes', user._id.toString()],
-              lang: 'js',
-            },
-          },
-          is_downvoted: {
-            $function: {
-              body: function (array, element) {
-                return array.includes(element);
-              },
-              args: ['$downvotes', user._id.toString()],
-              lang: 'js',
-            },
-          },
+          is_upvoted: { $cond: [{ $in: [user._id.toString(), '$upvotes'] }, true, false] },
+          is_downvoted: { $cond: [{ $in: [user._id.toString(), '$downvotes'] }, true, false] },
         },
       });
     }
