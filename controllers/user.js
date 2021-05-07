@@ -39,7 +39,7 @@ export default class UserController {
     // Validating request body
     try {
       validateEmail(email, 'email', true);
-      validateName(last_name, 'last_name');
+      validateString(last_name, 1, 30, 'last_name');
       validateName(first_name, 'first_name', true);
       validatePassword(password, 'password', true);
       validateUsername(username, 'username', true);
@@ -195,8 +195,8 @@ export default class UserController {
 
     // Validating request body
     try {
-      validateName(last_name, 'last_name');
       validateName(first_name, 'first_name');
+      validateString(last_name, 1, 30, 'last_name');
       validateString(bio, 5, 160, 'bio');
     } catch (err) {
       return res.badRequest(err.message);
