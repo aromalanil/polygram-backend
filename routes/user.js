@@ -21,7 +21,6 @@ const userRouter = Router();
 userRouter.post('/login', login);
 userRouter.post('/verify', verify);
 userRouter.post('/send-otp', sendOTP);
-userRouter.get('/:username', findUser);
 userRouter.post('/register', register);
 userRouter.post('/auth/google', googleOAuth);
 userRouter.get('/', authenticateUser, getDetails);
@@ -30,5 +29,7 @@ userRouter.post('/logout', authenticateUser, logout);
 userRouter.post('/edit', authenticateUser, editDetails);
 userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/profile_picture', authenticateUser, updateProfilePicture);
+
+userRouter.get('/:username', findUser);
 
 export default userRouter;
