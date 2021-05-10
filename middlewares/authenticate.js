@@ -6,7 +6,7 @@ const authenticateUser = async (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    return res.unAuthorizedRequest('Missing jwt token');
+    return res.unAuthorizedRequest('You are not logged in');
   }
 
   let username;

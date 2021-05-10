@@ -1,6 +1,6 @@
 {
   "name": "poly-backend",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "The REST Api for poll it",
   "main": "server.js",
   "type": "module",
