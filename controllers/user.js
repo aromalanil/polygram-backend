@@ -189,6 +189,15 @@ export default class UserController {
     res.status(200).json({ msg: 'User Found', data: { user } });
   };
 
+  getDetails = async (req, res) => {
+    const { user: loggedInUser } = req;
+
+    // Removing unwanted fields
+    const { password, __v, otp, verified, ...user } = loggedInUser.toJSON();
+
+    res.status(200).json({ msg: 'User Found', data: { user } });
+  };
+
   editDetails = async (req, res) => {
     const { user } = req;
     const { first_name, last_name, bio } = req.body;
