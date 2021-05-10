@@ -11,10 +11,10 @@ import {
 
 import User from '../models/user';
 import { sendOTP } from '../helpers/email';
-import { generateJWT } from '../helpers/jwt';
 import { getFutureDate } from '../helpers/date';
 import { verifyGoogleIdToken } from '../helpers/oauth';
 import { uploadProfilePicture } from '../helpers/image';
+import { generateJWT, validateJWT } from '../helpers/jwt';
 import { generateOTP, generateRandomPassword } from '../helpers/general';
 
 // Configuring ENV variables
@@ -196,6 +196,34 @@ export default class UserController {
     const { password, __v, otp, verified, ...user } = loggedInUser.toJSON();
 
     res.status(200).json({ msg: 'User Found', data: { user } });
+  };
+
+  findIfUserIsLoggedIn = async (req, res) => {
+    // Fetching jwt from cookie
+    const token = req.cookies.jwt;
+
+    // If token does not exist
+    if (!token) {
+      return res.status(200).json({ data: { is_user_logged_in: false } });
+    }
+
+    // Verifying jwt token
+    let username;
+    try {
+      username = validateJWT(token);
+    } catch (err) {
+      res.clearCookie('jwt'); // Logging out the user
+      return res.status(200).json({ data: { is_user_logged_in: false } });
+    }
+
+    // Checking if user exist in database
+    const user = await User.exists({ username, verified: true });
+    if (!user) {
+      res.clearCookie('jwt'); // Logging out the user
+      return res.status(200).json({ data: { is_user_logged_in: false } });
+    }
+
+    res.status(200).json({ data: { is_user_logged_in: true } });
   };
 
   editDetails = async (req, res) => {

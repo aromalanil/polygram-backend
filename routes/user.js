@@ -15,6 +15,7 @@ const {
   changePassword,
   forgotPassword,
   updateProfilePicture,
+  findIfUserIsLoggedIn,
 } = new UserController();
 const userRouter = Router();
 
@@ -26,6 +27,7 @@ userRouter.post('/auth/google', googleOAuth);
 userRouter.get('/', authenticateUser, getDetails);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/logout', authenticateUser, logout);
+userRouter.get('/is-logged-in', findIfUserIsLoggedIn);
 userRouter.post('/edit', authenticateUser, editDetails);
 userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/profile_picture', authenticateUser, updateProfilePicture);
