@@ -27,7 +27,7 @@ export default class QuestionController {
 
     // Finding question with corresponding ID
     const question = await Question.findById(id)
-      .populate('author', 'first_name last_name username')
+      .populate('author', 'first_name last_name username profile_picture')
       .select('-__v')
       .lean();
 
@@ -134,7 +134,7 @@ export default class QuestionController {
 
     const questions = await Question.find(query)
       .sort({ _id: 'descending' })
-      .populate('author', 'first_name last_name username')
+      .populate('author', 'first_name last_name username profile_picture')
       .limit(page_size)
       .select('-__v')
       .lean();
