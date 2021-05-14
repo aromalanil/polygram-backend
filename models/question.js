@@ -28,6 +28,13 @@ const questionSchema = new mongoose.Schema({
   },
 });
 
+questionSchema.virtual('opinion_count', {
+  ref: 'Opinion',
+  localField: '_id',
+  foreignField: 'question_id',
+  count: true,
+});
+
 questionSchema.index({ title: 'text', content: 'text' });
 
 const Question = mongoose.model('Question', questionSchema);
