@@ -107,9 +107,9 @@ export default class OpinionController {
 
     // If after_id is provided only include questions posted after after_id
     if (after_id) {
-      query._id = { $lt: after_id };
+      query._id = { $gt: after_id };
     } else if (before_id) {
-      query._id = { $gt: before_id };
+      query._id = { $lt: before_id };
     }
 
     // Add is_upvoted & is_downvoted to the result if user is logged in

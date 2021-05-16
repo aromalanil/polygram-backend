@@ -127,9 +127,9 @@ export default class QuestionController {
 
     // If after_id is provided only include questions posted after after_id
     if (after_id) {
-      query._id = { $lt: after_id };
+      query._id = { $gt: after_id };
     } else if (before_id) {
-      query._id = { $gt: before_id };
+      query._id = { $lt: before_id };
     }
 
     const questions = await Question.find(query)
