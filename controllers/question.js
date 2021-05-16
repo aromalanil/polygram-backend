@@ -77,15 +77,10 @@ export default class QuestionController {
 
   findQuestions = async (req, res) => {
     const { user } = req;
-    const {
-      topic,
-      search,
-      user_id,
-      before_id,
-      after_id,
-      page_size = 10,
-      following = 'false',
-    } = req.query;
+    const { topic, search, user_id, before_id, after_id, following = 'false' } = req.query;
+
+    let { page_size = 5 } = req.query;
+    page_size = parseInt(page_size, 10);
 
     // Validating request body
     try {

@@ -90,8 +90,11 @@ export default class OpinionController {
   };
 
   findOpinions = async (req, res) => {
-    const { question_id, before_id, after_id, page_size = 10 } = req.query;
     const { user } = req;
+    const { question_id, before_id, after_id } = req.query;
+
+    let { page_size = 5 } = req.query;
+    page_size = parseInt(page_size, 10);
 
     // Validating request body
     try {
