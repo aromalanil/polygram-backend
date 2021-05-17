@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { getMinutesBefore } from '../helpers/date';
-import { getRandomAvatarURL } from '../helpers/image';
 
 // Configuring ENV variables
 dotenv.config();
@@ -80,7 +79,7 @@ async function userSchemaPreSave() {
   }
 
   if (!this.profile_picture) {
-    this.profile_picture = getRandomAvatarURL(this.first_name);
+    this.profile_picture = `https://avatars.dicebear.com/api/bottts/${this.username}.svg`;
   }
 }
 
