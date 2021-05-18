@@ -142,6 +142,7 @@ export default class OpinionController {
       { $limit: page_size },
       ...addFieldQuery,
       { $lookup: { from: 'users', localField: 'author', foreignField: '_id', as: 'author' } },
+      { $unwind: '$author' },
       { $unset: [...authorFieldsToExclude, 'upvotes', 'downvotes', '__v'] },
     ]);
 
