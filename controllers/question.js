@@ -16,6 +16,7 @@ import { calculatePercentage } from '../helpers/general';
 
 export default class QuestionController {
   findSingleQuestion = async (req, res) => {
+    const { user } = req;
     const { id } = req.params;
 
     // Validating request body
@@ -68,6 +69,10 @@ export default class QuestionController {
 
       return { option, percentage: 0 };
     });
+
+    if (user) {
+      question.has_user_voted = await Opinion.exists({ question_id, author: user._id.toString() });
+    }
 
     res.status(200).json({
       msg: 'Question Found',
