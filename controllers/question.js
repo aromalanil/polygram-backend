@@ -62,16 +62,16 @@ export default class QuestionController {
     // Adding options without opinions to array with percentage 0
     question.options = question.options.map((option) => {
       const optionWithPercentage = optionsWithPercentage.find(
-        (optionObject) => optionObject.option === option
+        (optionObject) => optionObject.name === option
       );
 
       if (optionWithPercentage) return optionWithPercentage;
 
-      return { option, percentage: 0 };
+      return { name: option, percentage: 0 };
     });
 
     if (user) {
-      question.has_user_voted = await Opinion.exists({ question_id, author: user._id.toString() });
+      question.have_user_voted = await Opinion.exists({ question_id, author: user._id.toString() });
     }
 
     res.status(200).json({
@@ -249,7 +249,7 @@ function findPercentageFromWeightage(optionArray) {
   });
 
   return modifiedOptionArray.map((optionObject) => ({
-    option: optionObject.option,
+    name: optionObject.option,
     percentage: calculatePercentage(optionObject.weightage, weightageSum),
   }));
 }
