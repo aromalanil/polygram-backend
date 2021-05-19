@@ -48,4 +48,4 @@ export const getRandomValueFromArray = (array) => array[Math.floor(Math.random()
  * @param {Number} whole the whole
  * @returns Calculated percentage
  */
-export const calculatePercentage = (part, whole) => (part / whole) * 100;
+export const calculatePercentage = (part, whole) => (part === whole ? 100 : (part / whole) * 100);
