@@ -140,6 +140,12 @@ export default class OpinionController {
       { $match: query },
       { $sort: { _id: -1 } },
       { $limit: page_size },
+      {
+        $addFields: {
+          upvote_count: { $size: '$upvotes' },
+          downvote_count: { $size: '$downvotes' },
+        },
+      },
       ...addFieldQuery,
       { $lookup: { from: 'users', localField: 'author', foreignField: '_id', as: 'author' } },
       { $unwind: '$author' },
