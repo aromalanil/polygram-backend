@@ -30,6 +30,7 @@ export default class UserController {
       httpOnly: true,
       secure: isProduction,
       expires: cookieExpiryDate,
+      sameSite: isProduction ? 'none' : undefined,
     });
   };
 
