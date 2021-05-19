@@ -11,6 +11,7 @@ import {
 
 export default class TopicController {
   findSingleTopic = async (req, res) => {
+    const { user } = req;
     const { id } = req.params;
 
     // Validating request body
@@ -28,6 +29,10 @@ export default class TopicController {
       return res.notFound('Topic does not exist');
     }
 
+    // Adding if user follows the topic info
+    const topicsFollowedByUser = user?.followed_topics ?? [];
+    topic.followed_by_user = topicsFollowedByUser.includes(topic.name);
+
     res.status(200).json({
       msg: 'Topic Found',
       data: { topic },
@@ -35,6 +40,7 @@ export default class TopicController {
   };
 
   findTopic = async (req, res) => {
+    const { user } = req;
     const { count = 'false', search } = req.query;
 
     // Validating request body
@@ -93,6 +99,13 @@ export default class TopicController {
 
       topicsArray = topicsWithQuestions;
     }
+
+    // Adding if user follows the topic info
+    const topicsFollowedByUser = user?.followed_topics ?? [];
+    topicsArray = topicsArray.map((topic) => {
+      const doesUserFollowTopic = topicsFollowedByUser.includes(topic.name);
+      return { ...topic, followed_by_user: doesUserFollowTopic };
+    });
 
     res.status(200).json({
       msg: 'Topics Found',
