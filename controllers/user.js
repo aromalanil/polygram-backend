@@ -321,8 +321,10 @@ export default class UserController {
   };
 
   logout = async (req, res) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     // Deleting httpOnly cookie to logout cookie
-    res.clearCookie('jwt');
+    res.clearCookie('jwt', { sameSite: isProduction ? 'none' : undefined, secure: isProduction });
     res.status(200).json({ message: 'Successfully Logged Out' });
   };
 
