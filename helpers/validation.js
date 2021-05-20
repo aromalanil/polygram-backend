@@ -175,7 +175,7 @@ export const validateName = (name, fieldName = 'Name', isRequired = false) => {
 export const validateUsername = (username, fieldName = 'Username', isRequired = false) => {
   validateString(username, 4, 15, fieldName, isRequired);
 
-  if (!/[a-z0-9_-]+$/.test(username)) {
+  if (!/^[a-z0-9_-]*$/.test(username)) {
     throw new Error(
       `User name must only contain small letters, numbers, underscore( _ ) and hyphen( - )`
     );
