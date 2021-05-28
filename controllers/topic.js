@@ -3,6 +3,7 @@ import Question from '../models/question';
 import { stringToBoolean } from '../helpers/convertors';
 
 import {
+  validateNumber,
   validateString,
   validateBoolean,
   validateMongooseId,
@@ -43,9 +44,13 @@ export default class TopicController {
     const { user } = req;
     const { count = 'false', search } = req.query;
 
+    let { page_size = 5 } = req.query;
+    page_size = parseInt(page_size, 10);
+
     // Validating request body
     try {
       validateBoolean(stringToBoolean(count), 'count', false);
+      validateNumber(page_size, 1, 50, 'page_size', false);
       validateString(search, 0, 30, 'search', false);
     } catch (err) {
       return res.badRequest(err.message);
@@ -59,7 +64,7 @@ export default class TopicController {
       query.name = { $regex: search, $options: 'i' };
     }
 
-    let topicsArray = await Topic.find(query).select('name').lean();
+    let topicsArray = await Topic.find(query).limit(page_size).select('name').lean();
 
     if (stringToBoolean(count)) {
       let topicsWithQuestions = await Question.aggregate([
