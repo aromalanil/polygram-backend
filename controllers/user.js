@@ -254,22 +254,22 @@ export default class UserController {
   };
 
   forgotPassword = async (req, res) => {
-    const { otp, new_password, username } = req.body;
+    const { otp, new_password, email } = req.body;
 
     // Validating request body
     try {
-      validateUsername(username, 'username', true);
+      validateEmail(email, 'email', true);
       validateString(otp, 6, 6, 'otp', true);
       validatePassword(new_password, 'new_password', true);
     } catch (err) {
       return res.badRequest(err.message);
     }
 
-    const user = await User.findOne({ username, verified: true });
+    const user = await User.findOne({ email, verified: true });
 
     // Checking if user exist or not.
     if (!user) {
-      return res.notFound(`User with username ${username} do no exist`);
+      return res.notFound(`User with email ${email} do no exist`);
     }
 
     // Verifying the OTP
