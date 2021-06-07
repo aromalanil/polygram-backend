@@ -419,12 +419,16 @@ export default class UserController {
 
     // Validating request body
     try {
-      validateImage(image, 800, 125000, 'image', false);
+      validateImage(image, 8 * 600, 8 * 1024 * 1024 * 2, 'image', false);
     } catch (err) {
       return res.badRequest(err.message);
     }
 
     const image_url = await uploadProfilePicture(image, user.username);
+
+    if (!image_url) {
+      res.internalServerError('Error uploading the profile_picture');
+    }
 
     try {
       await User.findByIdAndUpdate(user._id, {
@@ -434,6 +438,11 @@ export default class UserController {
       res.internalServerError('Error updating the profile_picture');
     }
 
-    res.status(201).json({ msg: 'Profile picture updated successfully' });
+    res.status(201).json({
+      msg: 'Profile picture updated successfully',
+      data: {
+        profile_picture: image_url,
+      },
+    });
   };
 }

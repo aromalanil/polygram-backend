@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import Picture from '../models/picture';
 
 // Configuring ENV variables
@@ -15,12 +16,33 @@ export const uploadProfilePicture = async (base64Image, username) => {
   const [metaData, base64Data] = base64Image.split(',');
   const contentType = metaData.substring(metaData.indexOf(':') + 1, metaData.indexOf(';'));
 
-  const image = await Picture.findOneAndUpdate(
-    { username, type: 'profile_picture' },
-    { $set: { data: base64Data, content_type: contentType } },
-    { upsert: true, new: true }
-  );
+  // Starting a transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  const picture = new Picture({
+    username,
+    data: base64Data,
+    type: 'profile_picture',
+    content_type: contentType,
+  });
+
+  // Deleting question & all opinions on that question from DB
+  const updates = [
+    Picture.deleteOne({ username, type: 'profile_picture' }, { session }),
+    picture.save({ session }),
+  ];
+
+  try {
+    await Promise.all(updates);
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    return null;
+  } finally {
+    session.endSession();
+  }
 
   const hostname = process.env.HOSTNAME;
-  return `${hostname}/api/pictures/${image._id}`;
+  return `${hostname}/api/pictures/${picture._id}`;
 };
