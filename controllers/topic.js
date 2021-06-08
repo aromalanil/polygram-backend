@@ -42,7 +42,7 @@ export default class TopicController {
 
   findTopic = async (req, res) => {
     const { user } = req;
-    const { count = 'false', search } = req.query;
+    const { count = 'false', search, before_id, after_id } = req.query;
 
     let { page_size = 5 } = req.query;
     page_size = parseInt(page_size, 10);
@@ -50,6 +50,8 @@ export default class TopicController {
     // Validating request body
     try {
       validateBoolean(stringToBoolean(count), 'count', false);
+      validateMongooseId(before_id, 'before_id', false);
+      validateMongooseId(after_id, 'after_id', false);
       validateNumber(page_size, 1, 50, 'page_size', false);
       validateString(search, 0, 30, 'search', false);
     } catch (err) {
@@ -62,6 +64,13 @@ export default class TopicController {
         return res.badRequest('Search cannot be used along with count');
       }
       query.name = { $regex: search, $options: 'i' };
+    }
+
+    // If after_id is provided only include topics posted after after_id
+    if (after_id) {
+      query._id = { $gt: after_id };
+    } else if (before_id) {
+      query._id = { $lt: before_id };
     }
 
     let topicsArray = await Topic.find(query).limit(page_size).select('name').lean();
