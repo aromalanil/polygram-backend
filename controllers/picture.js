@@ -15,6 +15,7 @@ export default class PictureController {
 
     res.set('Content-Type', content_type);
     res.set('Content-Length', image.length);
+    res.set('Cache-Control', 'public, max-age=86400');
     res.send(image);
   };
 }
