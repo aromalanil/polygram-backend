@@ -60,9 +60,6 @@ export default class TopicController {
 
     const query = {};
     if (search) {
-      if (stringToBoolean(count)) {
-        return res.badRequest('Search cannot be used along with count');
-      }
       query.name = { $regex: search, $options: 'i' };
     }
 
@@ -73,10 +70,14 @@ export default class TopicController {
       query._id = { $lt: before_id };
     }
 
-    let topicsArray = await Topic.find(query).limit(page_size).select('name').lean();
+    let topicsArray = await Topic.find(query)
+      .sort({ _id: 'descending' })
+      .limit(page_size)
+      .select('name')
+      .lean();
 
     if (stringToBoolean(count)) {
-      let topicsWithQuestions = await Question.aggregate([
+      const topicsWithQuestions = await Question.aggregate([
         {
           $unwind: '$topics',
         },
@@ -98,20 +99,11 @@ export default class TopicController {
         },
       ]);
 
-      // Adding id to each topic
-      topicsWithQuestions = topicsWithQuestions.map((topic) => {
-        const fullTopicData = topicsArray.find((allTopic) => allTopic.name === topic.name);
-        return { _id: fullTopicData._id, ...topic };
+      topicsArray = topicsArray.map((topic) => {
+        const moreTopicInfo = topicsWithQuestions.find((_topic) => _topic.name === topic.name);
+        const questionCount = moreTopicInfo ? moreTopicInfo.question_count : 0;
+        return { ...topic, question_count: questionCount };
       });
-
-      topicsArray.forEach((allTopic) => {
-        const topicHasQuestions = topicsWithQuestions.find((topic) => allTopic.name === topic.name);
-        if (!topicHasQuestions) {
-          topicsWithQuestions.push({ ...allTopic, question_count: 0 });
-        }
-      });
-
-      topicsArray = topicsWithQuestions;
     }
 
     // Adding if user follows the topic info
