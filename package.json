@@ -1,7 +1,7 @@
 {
-  "name": "poly-backend",
-  "version": "1.8.1",
-  "description": "The REST Api for poll it",
+  "name": "polygram-backend",
+  "version": "1.9.0",
+  "description": "The REST API for Polygram",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aromalanil/poly-backend.git"
+    "url": "git+https://github.com/aromalanil/polygram-backend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aromalanil/poly-backend/issues"
+    "url": "https://github.com/aromalanil/polygram-backend/issues"
   },
-  "homepage": "https://github.com/aromalanil/poly-backend#readme",
+  "homepage": "https://github.com/aromalanil/polygram-backend#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",

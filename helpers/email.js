@@ -23,7 +23,7 @@ export const sendEmail = async (emailID, subject, textContent, htmlContent) => {
     auth: {
       accessToken: accessToken.token,
       type: 'OAuth2',
-      user: 'polywebapp@gmail.com',
+      user: 'polygramapp@gmail.com',
       client_id: googleOAuthClientID,
       refreshToken: googleRefreshToken,
       client_secret: googleOAuthClientSecret,
@@ -31,7 +31,7 @@ export const sendEmail = async (emailID, subject, textContent, htmlContent) => {
   });
 
   const mailOptions = {
-    from: 'Poly Webapp <polywebapp@gmail.com>',
+    from: 'Polygram App <polygramapp@gmail.com>',
     to: emailID,
     subject: subject,
     text: textContent,
