@@ -108,11 +108,11 @@ export default class OpinionController {
 
     const query = { question_id: mongoose.Types.ObjectId(question_id) };
 
-    // If after_id is provided only include questions posted after after_id
+    // If after_id is provided only include topics posted after after_id
     if (after_id) {
-      query._id = { $gt: after_id };
+      query._id = { $gt: mongoose.Types.ObjectId(after_id) };
     } else if (before_id) {
-      query._id = { $lt: before_id };
+      query._id = { $lt: mongoose.Types.ObjectId(before_id) };
     }
 
     // Add is_upvoted & is_downvoted to the result if user is logged in
