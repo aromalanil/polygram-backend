@@ -72,7 +72,7 @@ export default class OpinionController {
     }
 
     // Checking if the user is the author of the opinion
-    if (opinionToDelete.author !== user._id) {
+    if (!opinionToDelete.author.equals(user._id)) {
       return res.unAuthorizedRequest("You don't have the permission to delete this opinion");
     }
 
