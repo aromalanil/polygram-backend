@@ -167,6 +167,25 @@ export const validateName = (name, fieldName = 'Name', isRequired = false) => {
 
 /**
  *
+ * A validator function to validate Name
+ * @param {String} url URL to be validated
+ * @param {String} [fieldName] Field url to be displayed in error message.
+ * @param {Boolean} [isRequired] Is this field required or not.
+ */
+export const validateURL = (url, fieldName = 'URL', isRequired = false) => {
+  validateString(url, 3, 160, fieldName, isRequired);
+
+  if (
+    !/^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&//=]*)$/.test(
+      url
+    )
+  ) {
+    throw new Error(`Invalid ${fieldName}`);
+  }
+};
+
+/**
+ *
  * A validator function to validate Username
  * @param {String} username Username to be validated
  * @param {String} [fieldName] Field name to be displayed in error message.

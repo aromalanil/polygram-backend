@@ -1,6 +1,6 @@
 {
   "name": "polygram-backend",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "description": "The REST API for Polygram",
   "main": "server.js",
   "type": "module",
@@ -27,6 +27,7 @@
     "express": "^4.17.1",
     "google-auth-library": "^7.0.4",
     "jsonwebtoken": "^8.5.1",
+    "link-preview-js": "^2.1.6",
     "mongoose": "^5.12.3",
     "morgan": "^1.10.0",
     "nodemailer": "^6.5.0"
