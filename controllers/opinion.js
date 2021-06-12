@@ -11,7 +11,7 @@ export default class OpinionController {
     // Validating request body
     try {
       validateMongooseId(question_id, 'question_id', true);
-      validateString(content, 5, 500, 'content', true);
+      validateString(content, 5, 1600, 'content', true);
       validateString(option, 1, 30, 'option', true);
     } catch (err) {
       return res.badRequest(err.message);

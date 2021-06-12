@@ -152,7 +152,7 @@ export default class QuestionController {
     // Validating request body
     try {
       validateString(title, 15, 150, 'title', true);
-      validateString(content, 30, 1000, 'content', true);
+      validateString(content, 30, 1600, 'content', true);
       validateStringArray(options, 1, 30, 'options', 2, 5, true);
       validateStringArray(topics, 2, 30, 'topics', 1, 5, true);
     } catch (err) {
