@@ -16,10 +16,6 @@ export const uploadProfilePicture = async (base64Image, username) => {
   const [metaData, base64Data] = base64Image.split(',');
   const contentType = metaData.substring(metaData.indexOf(':') + 1, metaData.indexOf(';'));
 
-  // Starting a transaction
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   const picture = new Picture({
     username,
     data: base64Data,
@@ -27,20 +23,16 @@ export const uploadProfilePicture = async (base64Image, username) => {
     content_type: contentType,
   });
 
-  // Deleting question & all opinions on that question from DB
-  const updates = [
-    Picture.deleteOne({ username, type: 'profile_picture' }, { session }),
-    picture.save({ session }),
-  ];
+  // Starting a transaction
+  const session = await mongoose.startSession();
 
   try {
-    await Promise.all(updates);
-    await session.commitTransaction();
+    await session.withTransaction(async () => {
+      await Picture.deleteOne({ username, type: 'profile_picture' }, { session });
+      await picture.save({ session });
+    });
   } catch (err) {
-    await session.abortTransaction();
     return null;
-  } finally {
-    session.endSession();
   }
 
   const hostname = process.env.HOSTNAME;

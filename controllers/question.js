@@ -207,22 +207,14 @@ export default class QuestionController {
 
     // Starting a transaction
     const session = await mongoose.startSession();
-    session.startTransaction();
-
-    // Deleting question & all opinions on that question from DB
-    const updates = [
-      questionToDelete.delete({ session }),
-      Opinion.deleteMany({ question_id: id }, { session }),
-    ];
 
     try {
-      await Promise.all(updates);
-      await session.commitTransaction();
+      await session.withTransaction(async () => {
+        await questionToDelete.delete({ session });
+        await Opinion.deleteMany({ question_id: id }, { session });
+      });
     } catch (err) {
-      await session.abortTransaction();
       return res.internalServerError('Error deleting question');
-    } finally {
-      session.endSession();
     }
 
     res.status(200).json({ msg: 'Question deleted successfully' });
