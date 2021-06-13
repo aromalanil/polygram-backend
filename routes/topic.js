@@ -3,12 +3,19 @@ import addUser from '../middlewares/add-user';
 import TopicController from '../controllers/topic';
 import authenticateUser from '../middlewares/authenticate';
 
-const { findTopic, followTopic, unFollowTopic, getTrendingTopics } = new TopicController();
+const {
+  findTopics,
+  followTopic,
+  unFollowTopic,
+  findSingleTopic,
+  getTrendingTopics,
+} = new TopicController();
 
 const topicRouter = Router();
 
-topicRouter.get('/', addUser, findTopic);
+topicRouter.get('/', addUser, findTopics);
 topicRouter.get('/trending', addUser, getTrendingTopics);
+topicRouter.get('/single/:name', addUser, findSingleTopic);
 topicRouter.post('/follow', authenticateUser, followTopic);
 topicRouter.post('/unfollow', authenticateUser, unFollowTopic);
 

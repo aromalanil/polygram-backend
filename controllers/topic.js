@@ -10,7 +10,51 @@ import {
 } from '../helpers/validation';
 
 export default class TopicController {
-  findTopic = async (req, res) => {
+  findSingleTopic = async (req, res) => {
+    const { user } = req;
+    const { name } = req.params;
+
+    // Validating request body
+    try {
+      validateString(name, 2, 30, name, true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    let addIsUserFollowingField = {};
+    if (user && user.followed_topics) {
+      addIsUserFollowingField = {
+        followed_by_user: { $cond: [{ $in: ['$name', user.followed_topics] }, true, false] },
+      };
+    }
+
+    const topics = await Topic.aggregate([
+      { $match: { name } },
+      {
+        $lookup: {
+          from: 'questions',
+          localField: 'name',
+          foreignField: 'topics',
+          as: 'questions',
+        },
+      },
+      {
+        $addFields: {
+          question_count: { $size: '$questions' },
+          ...addIsUserFollowingField,
+        },
+      },
+      { $unset: ['__v', 'questions'] },
+    ]);
+
+    if (!topics || !topics[0]) {
+      return res.notFound('Topic not found');
+    }
+
+    res.status(200).json({ data: { topic: topics[0] } });
+  };
+
+  findTopics = async (req, res) => {
     const { user } = req;
     const { search, before_id, after_id } = req.query;
 
