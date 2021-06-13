@@ -366,7 +366,7 @@ export default class UserController {
   };
 
   googleOAuth = async (req, res) => {
-    const { token } = req.body;
+    const { token, type } = req.body;
 
     // Getting user details from google
     let ticket;
@@ -388,6 +388,9 @@ export default class UserController {
 
     // Creating new user if user does not exist
     if (!user) {
+      if (type === 'login') {
+        return res.notFound('User not found');
+      }
       // Generating dummy data
       const otp = { data: generateOTP(6), generated_at: new Date(0) };
       const password = generateRandomPassword(10);
