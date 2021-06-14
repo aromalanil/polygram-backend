@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 import {
   validateName,
@@ -10,6 +11,9 @@ import {
 } from '../helpers/validation';
 
 import User from '../models/user';
+import Opinion from '../models/opinion';
+import Picture from '../models/picture';
+import Question from '../models/question';
 import { sendOTP } from '../helpers/email';
 import { getFutureDate } from '../helpers/date';
 import { verifyGoogleIdToken } from '../helpers/oauth';
@@ -446,6 +450,28 @@ export default class UserController {
       data: {
         profile_picture: image_url,
       },
+    });
+  };
+
+  deleteAccount = async (req, res) => {
+    const { user } = req;
+
+    // Starting a transaction
+    const session = await mongoose.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        await Question.deleteMany({ author: user._id }, { session });
+        await Opinion.deleteMany({ author: user._id }, { session });
+        await Picture.deleteMany({ username: user.username }, { session });
+        await user.delete({ session });
+      });
+    } catch (err) {
+      return res.internalServerError('Error deleting question');
+    }
+
+    res.status(200).json({
+      msg: 'Account deleted successfully',
     });
   };
 }
