@@ -59,6 +59,17 @@ export default class NotificationController {
     });
   };
 
+  getNotificationCount = async (req, res) => {
+    const { user } = req;
+
+    const count = await Notification.countDocuments({ receiver: user._id, has_read: false });
+
+    res.status(200).json({
+      msg: 'Notifications Found',
+      data: { count },
+    });
+  };
+
   updateHasRead = async (req, res) => {
     const { user } = req;
     const { id } = req.params;
