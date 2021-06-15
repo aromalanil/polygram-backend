@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Opinion from '../models/opinion';
 import Question from '../models/question';
+import NotificationController from './notification';
 import { validateMongooseId, validateNumber, validateString } from '../helpers/validation';
 
 export default class OpinionController {
@@ -24,7 +25,7 @@ export default class OpinionController {
     }
 
     // Finding question with corresponding ID
-    const question = await Question.findById(question_id).select('options').lean();
+    const question = await Question.findById(question_id).select('options title author').lean();
 
     // Checking if question exist
     if (!question) {
@@ -37,7 +38,7 @@ export default class OpinionController {
       return req.badRequest('Invalid opinion');
     }
 
-    let opinion = new Opinion({
+    const opinion = new Opinion({
       option,
       content,
       question_id,
@@ -45,13 +46,31 @@ export default class OpinionController {
       upvotes: [user._id],
     });
 
+    let createdOpinion = {};
+
+    // Starting a transaction
+    const session = await mongoose.startSession();
+
     try {
-      opinion = await opinion.save();
+      await session.withTransaction(async () => {
+        createdOpinion = await opinion.save({ session });
+        await NotificationController.createNotification(
+          {
+            sender: user._id,
+            message: question.title,
+            type: 'added-opinion',
+            receiver: question.author,
+          },
+          { session }
+        );
+      });
     } catch (err) {
       return res.internalServerError('Error creating opinion');
     }
 
-    res.status(201).json({ msg: 'Opinion created successfully', data: { opinion } });
+    res
+      .status(201)
+      .json({ msg: 'Opinion created successfully', data: { opinion: createdOpinion } });
   };
 
   removeOpinion = async (req, res) => {

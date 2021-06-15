@@ -30,7 +30,7 @@ userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/logout', authenticateUser, logout);
 userRouter.get('/is-logged-in', findIfUserIsLoggedIn);
 userRouter.post('/edit', authenticateUser, editDetails);
-userRouter.post('/account', authenticateUser, deleteAccount);
+userRouter.post('/delete-account', authenticateUser, deleteAccount);
 userRouter.post('/change-password', authenticateUser, changePassword);
 userRouter.post('/profile_picture', authenticateUser, updateProfilePicture);
 

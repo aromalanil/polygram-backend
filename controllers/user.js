@@ -16,6 +16,8 @@ import Picture from '../models/picture';
 import Question from '../models/question';
 import { sendOTP } from '../helpers/email';
 import { getFutureDate } from '../helpers/date';
+import Notification from '../models/notification';
+import NotificationController from './notification';
 import { verifyGoogleIdToken } from '../helpers/oauth';
 import { uploadProfilePicture } from '../helpers/image';
 import { generateJWT, validateJWT } from '../helpers/jwt';
@@ -287,16 +289,31 @@ export default class UserController {
     user.expireOTP();
 
     user.password = new_password;
+
+    // Starting a transaction
+    const session = await mongoose.startSession();
+
     try {
-      await user.save();
+      await session.withTransaction(async () => {
+        await user.save({ session });
+        await NotificationController.createNotification(
+          {
+            message: 'The password of your account was changed recently',
+            type: 'changed-password',
+            receiver: user._id,
+          },
+          { session }
+        );
+      });
     } catch (err) {
-      return res.internalServerError(`Error saving user`);
+      return res.internalServerError('Password could not changed');
     }
 
     res.status(200).json({ message: 'Password changed successfully' });
   };
 
   changePassword = async (req, res) => {
+    const { user } = req;
     const { old_password, new_password } = req.body;
 
     // Validating request body
@@ -308,17 +325,31 @@ export default class UserController {
     }
 
     // Verifying if password matches
-    const doesPasswordMatch = await req.user.comparePassword(old_password);
+    const doesPasswordMatch = await user.comparePassword(old_password);
     if (!doesPasswordMatch) {
       return res.unAuthorizedRequest('Password does not match');
     }
 
     // Updating user password
-    req.user.password = new_password;
+    user.password = new_password;
+
+    // Starting a transaction
+    const session = await mongoose.startSession();
+
     try {
-      await req.user.save();
+      await session.withTransaction(async () => {
+        await user.save({ session });
+        await NotificationController.createNotification(
+          {
+            message: 'The password of your account was changed recently',
+            type: 'changed-password',
+            receiver: user._id,
+          },
+          { session }
+        );
+      });
     } catch (err) {
-      return res.internalServerError('Error saving Employer');
+      return res.internalServerError('Password could not changed');
     }
 
     res.status(201).json({ message: 'Password changed successfully' });
@@ -478,6 +509,10 @@ export default class UserController {
         await Question.deleteMany({ author: user._id }, { session });
         await Opinion.deleteMany({ author: user._id }, { session });
         await Picture.deleteMany({ username: user.username }, { session });
+        await Notification.deleteMany(
+          { $or: [{ sender: user._id }, { receiver: user._id }] },
+          { session }
+        );
         await user.delete({ session });
       });
     } catch (err) {
