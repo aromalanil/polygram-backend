@@ -60,6 +60,7 @@ export default class OpinionController {
             message: question.title,
             type: 'added-opinion',
             receiver: question.author,
+            targetContentId: question._id,
           },
           { session }
         );

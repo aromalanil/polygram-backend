@@ -23,6 +23,10 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  // The id of the resource that is to be targeted eg: For added-opinion it will be question_id
+  target_content_id: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
   created_at: {
     type: Date,
     expires: '30d',

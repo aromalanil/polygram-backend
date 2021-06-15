@@ -9,7 +9,10 @@ import {
 import Notification from '../models/notification';
 
 export default class NotificationController {
-  static createNotification = ({ message, receiver, type, sender }, { session }) => {
+  static createNotification = (
+    { message, receiver, type, sender, targetContentId },
+    { session }
+  ) => {
     validateString(message, 2, 160, 'message', true);
     validateString(type, 3, 30, 'type', true);
 
@@ -18,6 +21,7 @@ export default class NotificationController {
       sender,
       message,
       receiver,
+      target_content_id: targetContentId,
     });
 
     return notification.save({ session });
@@ -49,7 +53,9 @@ export default class NotificationController {
     }
 
     const notifications = await Notification.find(query)
+      .sort({ _id: 'descending' })
       .populate('sender', 'first_name last_name username profile_picture')
+      .limit(page_size)
       .select('-__v')
       .lean();
 
@@ -67,6 +73,40 @@ export default class NotificationController {
     res.status(200).json({
       msg: 'Notifications Found',
       data: { count },
+    });
+  };
+
+  deleteNotification = async (req, res) => {
+    const { user } = req;
+    const { id } = req.params;
+
+    // Validating request body
+    try {
+      validateMongooseId(id, 'notification_id', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    const notificationToDelete = await Notification.findById(id);
+    if (!notificationToDelete) {
+      return res.notFound('Notification not found');
+    }
+
+    // Checking if the user is the receiver of the question
+    if (!notificationToDelete.receiver.equals(user._id)) {
+      return res.unAuthorizedRequest("You don't have the permission to delete this question");
+    }
+
+    // Deleting notification from DB
+    try {
+      await notificationToDelete.delete();
+    } catch (err) {
+      return res.internalServerError('Error deleting notification');
+    }
+
+    res.status(200).json({
+      msg: 'Notification deleted successfully',
+      data: { notification: notificationToDelete },
     });
   };
 
