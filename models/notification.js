@@ -1,20 +1,21 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
-  user: {
+  receiver: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-  content: {
+  message: {
     type: String,
     required: true,
   },
   type: {
     type: String,
+    enum: ['added-opinion', 'changed-password'],
     required: true,
   },
-  author: {
+  sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },

@@ -9,26 +9,22 @@ import {
 import Notification from '../models/notification';
 
 export default class NotificationController {
-  static createNotification = ({ content, userId, type, author }) => {
-    validateString(content, 10, 160, 'content', true);
-    validateMongooseId(userId, 'userId', true);
+  static createNotification = ({ message, receiver, type, sender }, { session }) => {
+    validateString(message, 2, 160, 'message', true);
     validateString(type, 3, 30, 'type', true);
-
-    if (userId === 'added-opinion') {
-      validateMongooseId(author, author, true);
-    }
 
     const notification = new Notification({
       type,
-      author,
-      content,
-      user: userId,
+      sender,
+      message,
+      receiver,
     });
 
-    return notification.save();
+    return notification.save({ session });
   };
 
   findNotifications = async (req, res) => {
+    const { user } = req;
     const { before_id, after_id } = req.query;
 
     let { page_size = 5 } = req.query;
@@ -43,7 +39,7 @@ export default class NotificationController {
       return res.badRequest(err.message);
     }
 
-    const query = {};
+    const query = { receiver: user._id };
 
     // If after_id is provided only include topics posted after after_id
     if (after_id) {
@@ -52,8 +48,8 @@ export default class NotificationController {
       query._id = { $lt: mongoose.Types.ObjectId(before_id) };
     }
 
-    const notifications = await Notification.find({ query })
-      .populate('author', 'first_name last_name username profile_picture')
+    const notifications = await Notification.find(query)
+      .populate('sender', 'first_name last_name username profile_picture')
       .select('-__v')
       .lean();
 
@@ -78,7 +74,7 @@ export default class NotificationController {
 
     const notification = await Notification.findById(id);
 
-    if (!notification.user.equals(user._id)) {
+    if (!notification.receiver.equals(user._id)) {
       return res.unAuthorizedRequest("You don't have the permission to update this");
     }
 
@@ -97,8 +93,11 @@ export default class NotificationController {
   markAllAsRead = async (req, res) => {
     const { user } = req;
 
-    // TODO : Implement notification update logic
-    Notification.updateMany({ user: user._id });
+    try {
+      await Notification.updateMany({ receiver: user._id }, { $set: { has_read: true } });
+    } catch (err) {
+      return res.internalServerError('Error updating notifications');
+    }
 
     res.status(200).json({
       msg: 'All notifications marked as Read',
