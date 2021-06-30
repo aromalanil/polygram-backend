@@ -247,10 +247,10 @@ export default class QuestionController {
 function findPercentageFromWeightage(optionArray) {
   if (optionArray.length === 0) return [];
 
-  let weightageSum = 0;
-  optionArray.forEach((optionObject) => {
-    weightageSum = optionObject.weightage + weightageSum;
-  });
+  const weightageSum = optionArray.reduce(
+    (accumulator, optionObjectB) => accumulator + optionObjectB.weightage,
+    0
+  );
 
   return optionArray.map((optionObject) => ({
     name: optionObject.option,
