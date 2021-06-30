@@ -43,15 +43,38 @@ export default class QuestionController {
       { $match: { question_id } },
       {
         $addFields: {
-          upvoteDownvoteDifference: {
-            $subtract: [{ $size: '$upvotes' }, { $size: '$downvotes' }],
+          upvote_downvote_ratio: {
+            $cond: [
+              { $eq: [{ $size: '$downvotes' }, 0] },
+              { $divide: [{ $size: '$upvotes' }, 0.5] },
+              { $divide: [{ $size: '$upvotes' }, { $size: '$downvotes' }] },
+            ],
+          },
+          interaction_count: {
+            $sum: [{ $size: '$upvotes' }, { $size: '$downvotes' }],
+          },
+        },
+      },
+      {
+        $addFields: {
+          opinion_weightage: {
+            $multiply: [
+              '$upvote_downvote_ratio',
+              {
+                $cond: [
+                  { $eq: [{ $max: '$interaction_count' }, 0] },
+                  0,
+                  { $divide: ['$interaction_count', { $max: '$interaction_count' }] },
+                ],
+              },
+            ],
           },
         },
       },
       {
         $group: {
           _id: '$option',
-          weightage: { $sum: '$upvoteDownvoteDifference' },
+          weightage: { $sum: '$opinion_weightage' },
         },
       },
       { $project: { _id: 0, weightage: 1, option: '$_id' } },
@@ -223,24 +246,13 @@ export default class QuestionController {
 
 function findPercentageFromWeightage(optionArray) {
   if (optionArray.length === 0) return [];
-  const weightageArray = optionArray.map((optionObject) => optionObject.weightage);
-  const maxWeightage = Math.max(...weightageArray);
-  const minWeightage = Math.min(...weightageArray);
-
-  const shiftUnits = Math.abs(maxWeightage) + Math.abs(minWeightage);
-
-  // Shifting the weightage of each option by shiftUnit
-  const modifiedOptionArray = optionArray.map((optionObject) => ({
-    ...optionObject,
-    weightage: optionObject.weightage + shiftUnits,
-  }));
 
   let weightageSum = 0;
-  modifiedOptionArray.forEach((optionObject) => {
+  optionArray.forEach((optionObject) => {
     weightageSum = optionObject.weightage + weightageSum;
   });
 
-  return modifiedOptionArray.map((optionObject) => ({
+  return optionArray.map((optionObject) => ({
     name: optionObject.option,
     percentage: calculatePercentage(optionObject.weightage, weightageSum),
   }));
