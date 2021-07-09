@@ -43,15 +43,21 @@ export default class QuestionController {
       { $match: { question_id } },
       {
         $addFields: {
+          upvote_count: {
+            $cond: [{ $eq: [{ $size: '$upvotes' }, 0] }, 0.5, { $size: '$upvotes' }],
+          },
+          downvote_count: {
+            $cond: [{ $eq: [{ $size: '$downvotes' }, 0] }, 0.5, { $size: '$downvotes' }],
+          },
+        },
+      },
+      {
+        $addFields: {
           upvote_downvote_ratio: {
-            $cond: [
-              { $eq: [{ $size: '$downvotes' }, 0] },
-              { $divide: [{ $size: '$upvotes' }, 0.5] },
-              { $divide: [{ $size: '$upvotes' }, { $size: '$downvotes' }] },
-            ],
+            $divide: ['$upvote_count', '$downvote_count'],
           },
           interaction_count: {
-            $sum: [{ $size: '$upvotes' }, { $size: '$downvotes' }],
+            $sum: ['$upvote_count', '$downvote_count'],
           },
         },
       },
@@ -61,11 +67,7 @@ export default class QuestionController {
             $multiply: [
               '$upvote_downvote_ratio',
               {
-                $cond: [
-                  { $eq: [{ $max: '$interaction_count' }, 0] },
-                  0,
-                  { $divide: ['$interaction_count', { $max: '$interaction_count' }] },
-                ],
+                $divide: ['$interaction_count', { $max: '$interaction_count' }],
               },
             ],
           },
