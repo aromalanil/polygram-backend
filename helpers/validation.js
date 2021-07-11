@@ -173,7 +173,7 @@ export const validateName = (name, fieldName = 'Name', isRequired = false) => {
  * @param {Boolean} [isRequired] Is this field required or not.
  */
 export const validateURL = (url, fieldName = 'URL', isRequired = false) => {
-  validateString(url, 3, 160, fieldName, isRequired);
+  validateString(url, 3, 2048, fieldName, isRequired);
 
   if (
     !/^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&//=]*)$/.test(
