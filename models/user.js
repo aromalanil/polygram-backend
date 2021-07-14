@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     bio: { type: String, trim: true },
+    push_subscription: String,
     profile_picture: String,
     otp: {
       data: {

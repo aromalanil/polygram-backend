@@ -154,4 +154,42 @@ export default class NotificationController {
       msg: 'All notifications marked as Read',
     });
   };
+
+  subscribePushNotification = async (req, res) => {
+    const { user } = req;
+    const { subscription } = req.body;
+
+    const subscriptionJson = JSON.parse(subscription);
+    if (!subscriptionJson?.endpoint) {
+      return res.badRequest('Invalid subscription');
+    }
+
+    try {
+      user.push_subscription = subscription;
+      await user.save();
+    } catch (err) {
+      return res.internalServerError('Error subscribing to push notification');
+    }
+
+    res.status(200).json({
+      subscribed: true,
+      msg: 'Successfully subscribed to push notification',
+    });
+  };
+
+  unsubscribePushNotification = async (req, res) => {
+    const { user } = req;
+
+    try {
+      user.push_subscription = null;
+      await user.save();
+    } catch (err) {
+      return res.internalServerError('Error unsubscribing from push notification');
+    }
+
+    res.status(200).json({
+      subscribed: false,
+      msg: 'Successfully unsubscribed from push notification',
+    });
+  };
 }
