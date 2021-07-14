@@ -21,6 +21,7 @@ import NotificationController from './notification';
 import { verifyGoogleIdToken } from '../helpers/oauth';
 import { uploadProfilePicture } from '../helpers/image';
 import { generateJWT, validateJWT } from '../helpers/jwt';
+import { sendPushNotification } from '../helpers/notification';
 import { generateOTP, generateRandomPassword } from '../helpers/general';
 
 // Configuring ENV variables
@@ -186,7 +187,7 @@ export default class UserController {
     }
 
     const user = await User.findOne({ username, verified: true })
-      .select('-password -__v -otp -verified')
+      .select('-password -__v -otp -verified -push_subscription')
       .lean();
 
     if (!user) {
@@ -200,7 +201,7 @@ export default class UserController {
     const { user: loggedInUser } = req;
 
     // Removing unwanted fields
-    const { password, __v, otp, verified, ...user } = loggedInUser.toJSON();
+    const { password, __v, otp, verified, push_subscription, ...user } = loggedInUser.toJSON();
 
     res.status(200).json({ msg: 'User Found', data: { user } });
   };
@@ -309,6 +310,16 @@ export default class UserController {
       return res.internalServerError('Password could not changed');
     }
 
+    try {
+      sendPushNotification(
+        user.push_subscription,
+        'Password Changed',
+        'The password of your account was changed recently'
+      );
+    } catch (err) {
+      console.log('Error sending push notification'); // eslint-disable-line no-console
+    }
+
     res.status(200).json({ message: 'Password changed successfully' });
   };
 
@@ -352,11 +363,29 @@ export default class UserController {
       return res.internalServerError('Password could not changed');
     }
 
+    try {
+      sendPushNotification(
+        user.push_subscription,
+        'Password Changed',
+        'The password of your account was changed recently'
+      );
+    } catch (err) {
+      console.log('Error sending push notification'); // eslint-disable-line no-console
+    }
+
     res.status(201).json({ message: 'Password changed successfully' });
   };
 
   logout = async (req, res) => {
+    const { user } = req;
     const isProduction = process.env.NODE_ENV === 'production';
+
+    try {
+      user.push_subscription = null;
+      await user.save();
+    } catch (err) {
+      res.internalServerError('Error logging out user');
+    }
 
     // Deleting httpOnly cookie to logout the user
     res.clearCookie('jwt', { sameSite: isProduction ? 'none' : undefined, secure: isProduction });

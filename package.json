@@ -1,6 +1,6 @@
 {
   "name": "polygram-backend",
-  "version": "1.15.3",
+  "version": "1.16.0",
   "description": "The REST API for Polygram",
   "main": "server.js",
   "type": "module",
@@ -30,7 +30,8 @@
     "link-preview-js": "^2.1.6",
     "mongoose": "^5.12.3",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.5.0"
+    "nodemailer": "^6.5.0",
+    "web-push": "^3.4.5"
   },
   "devDependencies": {
     "eslint": "^7.23.0",

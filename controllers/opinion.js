@@ -3,6 +3,7 @@ import Opinion from '../models/opinion';
 import Question from '../models/question';
 import NotificationController from './notification';
 import { validateMongooseId, validateNumber, validateString } from '../helpers/validation';
+import { sendPushNotification } from '../helpers/notification';
 
 export default class OpinionController {
   addOpinion = async (req, res) => {
@@ -25,7 +26,10 @@ export default class OpinionController {
     }
 
     // Finding question with corresponding ID
-    const question = await Question.findById(question_id).select('options title author').lean();
+    const question = await Question.findById(question_id)
+      .select('options title author')
+      .populate('author', 'push_subscription')
+      .lean();
 
     // Checking if question exist
     if (!question) {
@@ -59,7 +63,7 @@ export default class OpinionController {
             sender: user._id,
             message: question.title,
             type: 'added-opinion',
-            receiver: question.author,
+            receiver: question.author._id,
             targetContentId: question._id,
           },
           { session }
@@ -67,6 +71,16 @@ export default class OpinionController {
       });
     } catch (err) {
       return res.internalServerError('Error creating opinion');
+    }
+
+    try {
+      sendPushNotification(
+        question.author.push_subscription,
+        'Received an Opinion',
+        `${user.first_name} responded to your question "${question.title}"`
+      );
+    } catch (err) {
+      console.log('Error sending push notification'); // eslint-disable-line no-console
     }
 
     res
@@ -149,11 +163,12 @@ export default class OpinionController {
     const authorFieldsToExclude = [
       'author.__v',
       'author._id',
-      'author.verified',
-      'author.followed_topics',
-      'author.otp',
-      'author.password',
       'author.email',
+      'author.otp',
+      'author.verified',
+      'author.password',
+      'author.followed_topics',
+      'author.push_subscription',
     ];
 
     const opinions = await Opinion.aggregate([
