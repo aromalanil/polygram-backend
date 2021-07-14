@@ -1,6 +1,6 @@
 {
   "name": "polygram-backend",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "description": "The REST API for Polygram",
   "main": "server.js",
   "type": "module",

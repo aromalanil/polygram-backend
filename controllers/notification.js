@@ -1,12 +1,19 @@
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import User from '../models/user';
+import Notification from '../models/notification';
+import { sendPushNotification as sendPush } from '../helpers/notification';
+
 import {
   validateNumber,
   validateString,
   validateBoolean,
   validateMongooseId,
+  validateStringArray,
 } from '../helpers/validation';
 
-import Notification from '../models/notification';
+// Configuring ENV variables
+dotenv.config();
 
 export default class NotificationController {
   static createNotification = (
@@ -191,5 +198,39 @@ export default class NotificationController {
       subscribed: false,
       msg: 'Successfully unsubscribed from push notification',
     });
+  };
+
+  sendPushNotification = async (req, res) => {
+    const { master_password, usernames, title, body } = req.body;
+
+    try {
+      validateStringArray(usernames, 4, 15, 'usernames', 1, 100);
+      validateString(title, 3, 50, 'title', true);
+      validateString(body, 3, 150, 'body', true);
+    } catch (err) {
+      return res.badRequest(err.message);
+    }
+
+    if (master_password !== process.env.MASTER_PASSWORD) {
+      return res.unAuthorizedRequest('You are not authorized to access this route');
+    }
+
+    const query = { push_subscription: { $ne: null } };
+    if (usernames) {
+      query.username = { $in: usernames };
+    }
+
+    const users = await User.find(query).select('push_subscription').lean();
+    if (users.length === 0) {
+      return res.status(200).json({ msg: 'No user found' });
+    }
+
+    const sendNotificationArray = users.map(({ push_subscription }) =>
+      sendPush(push_subscription, title, body)
+    );
+
+    await Promise.allSettled(sendNotificationArray);
+
+    res.status(200).json({ msg: 'All push notifications send successfully' });
   };
 }

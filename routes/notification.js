@@ -8,12 +8,14 @@ const {
   findNotifications,
   deleteNotification,
   getNotificationCount,
+  sendPushNotification,
   subscribePushNotification,
   unsubscribePushNotification,
 } = new NotificationController();
 
 const notificationRouter = Router();
 
+notificationRouter.post('/send-push', sendPushNotification);
 notificationRouter.get('/', authenticateUser, findNotifications);
 notificationRouter.delete('/:id', authenticateUser, deleteNotification);
 notificationRouter.get('/count', authenticateUser, getNotificationCount);
