@@ -4,10 +4,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
-import apiRouter from './routes/api';
-import cors from './middlewares/cors';
-import httpErrors from './middlewares/http-errors';
-import ErrorController from './controllers/error';
+import apiRouter from './routes/api.js';
+import cors from './middlewares/cors.js';
+import httpErrors from './middlewares/http-errors.js';
+import ErrorController from './controllers/error.js';
 
 const { handleNotFound, handleServerErrors } = new ErrorController();
 

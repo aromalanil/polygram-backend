@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import authenticateUser from '../middlewares/authenticate';
-import NotificationController from '../controllers/notification';
+import authenticateUser from '../middlewares/authenticate.js';
+import NotificationController from '../controllers/notification.js';
 
 const {
   updateHasRead,

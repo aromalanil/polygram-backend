@@ -6,13 +6,13 @@ import {
   validateBoolean,
   validateMongooseId,
   validateStringArray,
-} from '../helpers/validation';
+} from '../helpers/validation.js';
 
-import Topic from '../models/topic';
-import Opinion from '../models/opinion';
-import Question from '../models/question';
-import { stringToBoolean } from '../helpers/convertors';
-import { calculatePercentage } from '../helpers/general';
+import Topic from '../models/topic.js';
+import Opinion from '../models/opinion.js';
+import Question from '../models/question.js';
+import { stringToBoolean } from '../helpers/convertors.js';
+import { calculatePercentage } from '../helpers/general.js';
 
 export default class QuestionController {
   findSingleQuestion = async (req, res) => {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import UtilsController from '../controllers/utils';
+import UtilsController from '../controllers/utils.js';
 
 const { getLinkPreview } = new UtilsController();
 

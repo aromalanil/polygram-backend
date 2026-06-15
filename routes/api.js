@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-import userRouter from './user';
-import topicRouter from './topic';
-import utilsRouter from './utils';
-import pictureRouter from './picture';
-import opinionRouter from './opinion';
-import questionRouter from './question';
-import notificationRouter from './notification';
+import userRouter from './user.js';
+import topicRouter from './topic.js';
+import utilsRouter from './utils.js';
+import pictureRouter from './picture.js';
+import opinionRouter from './opinion.js';
+import questionRouter from './question.js';
+import notificationRouter from './notification.js';
 
 const apiRouter = Router();
 

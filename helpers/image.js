@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import Picture from '../models/picture';
+import Picture from '../models/picture.js';
 
 // Configuring ENV variables
 dotenv.config();

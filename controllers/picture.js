@@ -1,4 +1,4 @@
-import Picture from '../models/picture';
+import Picture from '../models/picture.js';
 
 export default class PictureController {
   getPicture = async (req, res) => {

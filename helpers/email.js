@@ -4,8 +4,8 @@ import {
   googleRefreshToken,
   googleOAuthClientID,
   googleOAuthClientSecret,
-} from './oauth';
-import { generateOtpHTMLTemplate, generateOtpTextTemplate } from './template';
+} from './oauth.js';
+import { generateOtpHTMLTemplate, generateOtpTextTemplate } from './template.js';
 
 /**
  *

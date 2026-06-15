@@ -13,6 +13,10 @@ const httpErrors = (req, res, next) => {
     sendJsonErrorMessage(res, 401, message);
   };
 
+  res.forbiddenRequest = (message) => {
+    sendJsonErrorMessage(res, 403, message);
+  };
+
   res.notFound = (message) => {
     sendJsonErrorMessage(res, 404, message);
   };

@@ -8,21 +8,21 @@ import {
   validateString,
   validateUsername,
   validatePassword,
-} from '../helpers/validation';
+} from '../helpers/validation.js';
 
-import User from '../models/user';
-import Opinion from '../models/opinion';
-import Picture from '../models/picture';
-import Question from '../models/question';
-import { sendOTP } from '../helpers/email';
-import { getFutureDate } from '../helpers/date';
-import Notification from '../models/notification';
-import NotificationController from './notification';
-import { verifyGoogleIdToken } from '../helpers/oauth';
-import { uploadProfilePicture } from '../helpers/image';
-import { generateJWT, validateJWT } from '../helpers/jwt';
-import { sendPushNotification } from '../helpers/notification';
-import { generateOTP, generateRandomPassword } from '../helpers/general';
+import User from '../models/user.js';
+import Opinion from '../models/opinion.js';
+import Picture from '../models/picture.js';
+import Question from '../models/question.js';
+import { sendOTP } from '../helpers/email.js';
+import { getFutureDate } from '../helpers/date.js';
+import Notification from '../models/notification.js';
+import NotificationController from './notification.js';
+import { verifyGoogleIdToken } from '../helpers/oauth.js';
+import { uploadProfilePicture } from '../helpers/image.js';
+import { generateJWT, validateJWT } from '../helpers/jwt.js';
+import { sendPushNotification } from '../helpers/notification.js';
+import { generateOTP, generateRandomPassword } from '../helpers/general.js';
 
 // Configuring ENV variables
 dotenv.config();

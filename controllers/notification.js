@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import User from '../models/user';
-import Notification from '../models/notification';
-import { sendPushNotification as sendPush } from '../helpers/notification';
+import User from '../models/user.js';
+import Notification from '../models/notification.js';
+import { sendPushNotification as sendPush } from '../helpers/notification.js';
 
 import {
   validateNumber,
@@ -10,7 +10,7 @@ import {
   validateBoolean,
   validateMongooseId,
   validateStringArray,
-} from '../helpers/validation';
+} from '../helpers/validation.js';
 
 // Configuring ENV variables
 dotenv.config();

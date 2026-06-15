@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import addUser from '../middlewares/add-user';
-import OpinionController from '../controllers/opinion';
-import authenticateUser from '../middlewares/authenticate';
+import addUser from '../middlewares/add-user.js';
+import OpinionController from '../controllers/opinion.js';
+import authenticateUser from '../middlewares/authenticate.js';
 
 const {
   addUpvote,

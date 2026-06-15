@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
-import { getMinutesBefore } from '../helpers/date';
+import { getMinutesBefore } from '../helpers/date.js';
 
 // Configuring ENV variables
 dotenv.config();

@@ -1,5 +1,5 @@
-import { validateJWT } from '../helpers/jwt';
-import User from '../models/user';
+import { validateJWT } from '../helpers/jwt.js';
+import User from '../models/user.js';
 
 const authenticateUser = async (req, res, next) => {
   // Fetching jwt from cookie

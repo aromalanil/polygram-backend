@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import Opinion from '../models/opinion';
-import Question from '../models/question';
-import NotificationController from './notification';
-import { validateMongooseId, validateNumber, validateString } from '../helpers/validation';
-import { sendPushNotification } from '../helpers/notification';
+import Opinion from '../models/opinion.js';
+import Question from '../models/question.js';
+import NotificationController from './notification.js';
+import { validateMongooseId, validateNumber, validateString } from '../helpers/validation.js';
+import { sendPushNotification } from '../helpers/notification.js';
 
 export default class OpinionController {
   addOpinion = async (req, res) => {

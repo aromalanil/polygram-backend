@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 
-import Topic from '../models/topic';
+import Topic from '../models/topic.js';
 
 import {
   validateNumber,
   validateString,
   validateMongooseId,
   validateStringArray,
-} from '../helpers/validation';
+} from '../helpers/validation.js';
 
 export default class TopicController {
   findSingleTopic = async (req, res) => {

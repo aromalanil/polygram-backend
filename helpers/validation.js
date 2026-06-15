@@ -1,4 +1,4 @@
-import { calculateImageSize } from './general';
+import { calculateImageSize } from './general.js';
 
 /**
  *
