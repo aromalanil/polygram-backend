@@ -140,13 +140,13 @@ export default class OpinionController {
       return res.badRequest(err.message);
     }
 
-    const query = { question_id: mongoose.Types.ObjectId(question_id) };
+    const query = { question_id: mongoose.Types.ObjectId.createFromHexString(question_id) };
 
     // If after_id is provided only include topics posted after after_id
     if (after_id) {
-      query._id = { $gt: mongoose.Types.ObjectId(after_id) };
+      query._id = { $gt: mongoose.Types.ObjectId.createFromHexString(after_id) };
     } else if (before_id) {
-      query._id = { $lt: mongoose.Types.ObjectId(before_id) };
+      query._id = { $lt: mongoose.Types.ObjectId.createFromHexString(before_id) };
     }
 
     // Add is_upvoted & is_downvoted to the result if user is logged in

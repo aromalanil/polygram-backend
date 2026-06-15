@@ -78,9 +78,9 @@ export default class TopicController {
 
     // If after_id is provided only include topics posted after after_id
     if (after_id) {
-      query._id = { $gt: mongoose.Types.ObjectId(after_id) };
+      query._id = { $gt: mongoose.Types.ObjectId.createFromHexString(after_id) };
     } else if (before_id) {
-      query._id = { $lt: mongoose.Types.ObjectId(before_id) };
+      query._id = { $lt: mongoose.Types.ObjectId.createFromHexString(before_id) };
     }
 
     let isUserFollowingQuery = {};

@@ -37,7 +37,7 @@ export default class QuestionController {
       return res.notFound('Question does not exist');
     }
 
-    const question_id = mongoose.Types.ObjectId(id);
+    const question_id = mongoose.Types.ObjectId.createFromHexString(id);
 
     const optionsWithWeightage = await Opinion.aggregate([
       { $match: { question_id } },
@@ -96,7 +96,10 @@ export default class QuestionController {
     });
 
     if (user) {
-      question.have_user_voted = await Opinion.exists({ question_id, author: user._id.toString() });
+      question.have_user_voted = !!(await Opinion.exists({
+        question_id,
+        author: user._id.toString(),
+      }));
     }
 
     res.status(200).json({

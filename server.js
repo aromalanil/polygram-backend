@@ -31,12 +31,7 @@ app.use(morgan('combined'));
 
 // Connecting to database
 mongoose
-  .connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-  })
+  .connect(process.env.DATABASE_URL)
   .then(() => {
     console.log('Database Connected Successfully'); // eslint-disable-line
   })
