@@ -166,13 +166,33 @@ export default class NotificationController {
     const { user } = req;
     const { subscription } = req.body;
 
-    const subscriptionJson = JSON.parse(subscription);
+    if (!subscription) {
+      return res.badRequest('Subscription is required');
+    }
+
+    let subscriptionJson;
+    let subscriptionString;
+
+    if (typeof subscription === 'string') {
+      try {
+        subscriptionJson = JSON.parse(subscription);
+        subscriptionString = subscription;
+      } catch (err) {
+        return res.badRequest('Invalid subscription JSON format');
+      }
+    } else if (typeof subscription === 'object' && subscription !== null) {
+      subscriptionJson = subscription;
+      subscriptionString = JSON.stringify(subscription);
+    } else {
+      return res.badRequest('Subscription must be a string or an object');
+    }
+
     if (!subscriptionJson?.endpoint) {
-      return res.badRequest('Invalid subscription');
+      return res.badRequest('Invalid subscription: endpoint is required');
     }
 
     try {
-      user.push_subscription = subscription;
+      user.push_subscription = subscriptionString;
       await user.save();
     } catch (err) {
       return res.internalServerError('Error subscribing to push notification');
