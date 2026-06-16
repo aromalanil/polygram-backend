@@ -112,7 +112,7 @@ export default class OpinionController {
 
     // Deleting opinion from DB
     try {
-      await opinionToDelete.delete();
+      await opinionToDelete.deleteOne();
     } catch (err) {
       return res.internalServerError('Error deleting opinion');
     }

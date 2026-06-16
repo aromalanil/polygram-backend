@@ -106,7 +106,7 @@ export default class NotificationController {
 
     // Deleting notification from DB
     try {
-      await notificationToDelete.delete();
+      await notificationToDelete.deleteOne();
     } catch (err) {
       return res.internalServerError('Error deleting notification');
     }

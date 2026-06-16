@@ -542,7 +542,7 @@ export default class UserController {
           { $or: [{ sender: user._id }, { receiver: user._id }] },
           { session }
         );
-        await user.delete({ session });
+        await user.deleteOne({ session });
       });
     } catch (err) {
       return res.internalServerError('Error deleting question');

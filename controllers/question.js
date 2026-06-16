@@ -238,7 +238,7 @@ export default class QuestionController {
 
     try {
       await session.withTransaction(async () => {
-        await questionToDelete.delete({ session });
+        await questionToDelete.deleteOne({ session });
         await Opinion.deleteMany({ question_id: id }, { session });
       });
     } catch (err) {
