@@ -5,11 +5,9 @@ import { OAuth2Client } from 'google-auth-library';
 dotenv.config();
 
 export const googleOAuthClientID = process.env.GOOGLE_OAUTH_CLIENT_ID;
-export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-export const googleRefreshToken = process.env.GOOGLE_REFRESH_TOKEN;
 
-export const googleOAuthClient = new OAuth2Client(googleOAuthClientID, googleOAuthClientSecret);
-googleOAuthClient.setCredentials({ refresh_token: googleRefreshToken });
+// Client secret is not needed as we are just verifying the token, not exchanging it for an access token
+export const googleOAuthClient = new OAuth2Client(googleOAuthClientID);
 
 export const verifyGoogleIdToken = (token) =>
   googleOAuthClient.verifyIdToken({

@@ -1,11 +1,11 @@
-import { createTransport } from 'nodemailer';
-import {
-  googleOAuthClient,
-  googleRefreshToken,
-  googleOAuthClientID,
-  googleOAuthClientSecret,
-} from './oauth.js';
+import dotenv from 'dotenv';
+import { Resend } from 'resend';
 import { generateOtpHTMLTemplate, generateOtpTextTemplate } from './template.js';
+
+// Configuring ENV variables
+dotenv.config();
+
+const resend = new Resend(process.env.RESENT_API_KEY);
 
 /**
  *
@@ -16,29 +16,19 @@ import { generateOtpHTMLTemplate, generateOtpTextTemplate } from './template.js'
  * @param {String} htmlContent Content of the email as HTML
  */
 export const sendEmail = async (emailID, subject, textContent, htmlContent) => {
-  const accessToken = await googleOAuthClient.getAccessToken();
-
-  const transporter = createTransport({
-    service: 'gmail',
-    auth: {
-      accessToken: accessToken.token,
-      type: 'OAuth2',
-      user: 'polygramapp@gmail.com',
-      client_id: googleOAuthClientID,
-      refreshToken: googleRefreshToken,
-      client_secret: googleOAuthClientSecret,
-    },
-  });
-
-  const mailOptions = {
-    from: 'Polygram App <polygramapp@gmail.com>',
-    to: emailID,
+  const { data, error } = await resend.emails.send({
+    from: 'Polygram <no-reply@polygram.aromalanil.in>',
+    to: [emailID],
     subject: subject,
     text: textContent,
     html: htmlContent !== undefined ? htmlContent : `<p>${textContent}</p>`,
-  };
+  });
 
-  return transporter.sendMail(mailOptions);
+  if (error) {
+    throw error;
+  }
+
+  return data;
 };
 
 /**
