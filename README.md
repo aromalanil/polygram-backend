@@ -1,6 +1,6 @@
 # Polygram: Rest API
 
-Official Rest api of [Polygram](https://polygram.netlify.app)
+Official Rest api of [Polygram](https://polygram.aromalanil.in)
 
 ## Setup
 
