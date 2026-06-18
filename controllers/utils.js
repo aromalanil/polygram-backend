@@ -3,6 +3,7 @@ import { validateURL } from '../helpers/validation.js';
 
 export default class UtilsController {
   getLinkPreview = async (req, res) => {
+    res.set('Cache-Control', 'public, max-age=900');
     const { url } = req.query;
 
     // Validating request body
@@ -19,7 +20,6 @@ export default class UtilsController {
       return res.badRequest('Unable to get link preview');
     }
 
-    res.set('Cache-Control', 'public, max-age=900');
     res.status(200).json({ data });
   };
 }
