@@ -19,6 +19,7 @@ export default class UtilsController {
       return res.badRequest('Unable to get link preview');
     }
 
+    res.set('Cache-Control', 'public, max-age=900');
     res.status(200).json({ data });
   };
 }
