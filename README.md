@@ -1,766 +1,148 @@
-# Polygram: Rest API
+<div align="center">
+  <img width="70" src="https://user-images.githubusercontent.com/49222186/134722810-b295aca2-2544-4cd1-b388-17b5320d8fea.png" alt="logo"/>
+  <h3>Polygram API</h3>
+  <p><b>The robust, scalable RESTful API powering the Polygram platform.</b></p>
 
-Official Rest api of [Polygram](https://polygram.aromalanil.in)
+  <a href="https://github.com/aromalanil/polygram-backend/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/aromalanil/polygram-backend"></a>&nbsp;&nbsp;
+  <a href="https://github.com/aromalanil/polygram-backend/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/aromalanil/polygram-backend"></a>
+</div>
 
-## Setup
+<br />
 
-### Requirements
+The **Polygram API** serves as the backend engine for Polygram. It handles data persistence, complex business logic, secure authentication, and real-time push notification dispatching, built entirely with Node.js and Express.
 
-- [Node.js](https://nodejs.org/)
+---
+
+## 🚀 Key Features
+
+- **Secure Authentication**: Integrates both traditional email/password login (with secure hashing) and Google OAuth using JSON Web Tokens (JWT) for stateless session management.
+- **Web Push Notifications**: Manages VAPID keys and push subscriptions, seamlessly pushing native updates to the client (e.g., new votes, followers) using `web-push`.
+- **OTP & Email Integration**: Handles secure password resets and account verification via email using Resend.
+- **Metadata Extraction**: Utilizes `link-preview-js` to generate dynamic previews for shared links with efficient HTTP caching strategies to minimize redundant requests.
+- **RESTful Architecture**: Follows clean REST principles with clearly separated routes, controllers, and Mongoose models.
+
+## 🛠 Tech Stack & Architecture
+
+- **Runtime & Framework**: [Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/) for object data modeling and validation.
+- **Authentication**: `jsonwebtoken`, `bcryptjs`, and Google Auth Library.
+- **Utilities**: `web-push` (Notifications), `resend` (Emails), `link-preview-js` (Scraping).
+
+## 💻 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v14 or higher recommended)
+- [MongoDB](https://www.mongodb.com/) instance (local or Atlas)
 - [Git](https://git-scm.com/)
 
-### Installation
+### Local Installation
 
-Clone the repo locally then install all the dependencies using [NPM](https://npmjs.org/)
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/aromalanil/polygram-backend.git
+   cd polygram-backend
+   ```
 
-```bash
-git clone https://github.com/aromalanil/polygram-backend.git
-cd polygram-backend
-npm install
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Local Development
+3. Configure Environment Variables: Create a `.env` file in the root directory (see the [Environment Variables](#-environment-variables) table below).
 
-1. Create a `.env` file in the project root and add all the environment variables mentioned [here](#environment-variables)
-2. Execute the following command.
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The API will be available at `http://localhost:5000`.
 
-```bash
-npm run dev
-```
+## ⚙️ Available Scripts
 
-This will start a local server at [http://localhost:5000](http://localhost:5000)
+| Command | Description |
+|---|---|
+| `npm run dev` | Starts the server in development mode using `nodemon` for auto-reloading. |
+| `npm start` | Starts the Node server in production mode. |
+| `npm run lint` | Lints all JavaScript files using ESLint. |
+| `npm run lint:fix` | Automatically fixes fixable linting errors. |
 
-### Production
+## 🔑 Environment Variables
 
-1. Create a `.env` file in the project root and add all the envrionment variables mentioned [here](#environment-variables)
-2. Execute the following command.
+| Variable | Description |
+|---|---|
+| `PORT` | The port for the server to listen on (e.g., `5000`) |
+| `NODE_ENV` | `development` or `production` |
+| `HOSTNAME` | The deployed URL of the server |
+| `DATABASE_URL` | MongoDB connection string URI |
+| `JWT_SECRET` | A long random string used to sign JWTs |
+| `ALLOWED_ORIGINS` | Space-separated list of origins allowed via CORS |
+| `GOOGLE_OAUTH_CLIENT_ID` | OAuth Client ID from Google Console |
+| `GOOGLE_OAUTH_CLIENT_SECRET`| OAuth Client Secret from Google Console |
+| `GOOGLE_REFRESH_TOKEN` | Refresh token from Google |
+| `VAPID_PUBLIC_KEY` | Public key for push notifications generated via `web-push` |
+| `VAPID_PRIVATE_KEY` | Private key for push notifications |
+| `MASTER_PASSWORD` | Master password for adding system topics |
 
-```bash
-npm start
-```
+## 📖 API Documentation
 
-## Environment Variables
-
-| Variable                     | Description                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------------- |
-| `PORT`                       | The port in which the server should run                                           |
-| `NODE_ENV`                   | `development` or `production`                                                     |
-| `HOSTNAME`                   | The url to which the server is deployed                                           |
-| `GOOGLE_OAUTH_CLIENT_SECRET` | OAuth secret from Google                                                          |
-| `JWT_SECRET`                 | A long random string, to sign the JWT                                             |
-| `GOOGLE_OAUTH_CLIENT_ID`     | Client ID from Google                                                             |
-| `ALLOWED_ORIGINS`            | All origins to which CORS will be enabled. (Origins should be seperated by space) |
-| `GOOGLE_REFRESH_TOKEN`       | Refresh token from Google                                                         |
-| `VAPID_PUBLIC_KEY`           | Public key generated using `webpush` library                                      |
-| `VAPID_PRIVATE_KEY`          | Private key generated using `webpush` library                                     |
-| `GOOGLE_REFRESH_TOKEN`       | Refresh token from Google                                                         |
-| `MASTER_PASSWORD`            | Master password for adding topics                                                 |
-| `DATABASE_URL`               | Connection link for mongoDB                                                       |
-
-## Documentation
-
-## User
-
-- Every user related routes falls here
-
-### Register `POST`
-
-    /api/users/register
-
-Register a user to Poly by providing the necessary details. This route will send an OTP to the given email id, which can be used to verify the user
+The API endpoints are organized by resource. Below is an overview of the core endpoints.
 
 <details>
-  <summary>▶️ Example</summary>
-  
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST  BODY 
-```json
-{
-    "email":"aromalanilkannan@gmail.com",
-    "first_name":"Aromal",
-    "last_name":"Anil",
-    "password":"Passw0rd1@3",
-    "username":"aromalanil"
-}
-```
-#####  <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" />  EXAMPLE RESPONSE
+<summary><strong>Users & Authentication (/api/users)</strong></summary>
 
-```json
-{
-  "msg": "User created successfully"
-}
-```
-
-</details>    
-    
-###  Verify `POST`
-	
-	/api/users/verify
-	
-After the user registration is completed, use this route to verify the user. OTP send to the user must also be included in the request.
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "username": "aromalanil",
-  "otp": "060690"
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "message": "Account verified & Logged In"
-}
-```
+- `POST /register` - Register a new user and trigger an OTP email.
+- `POST /verify` - Verify user account using the OTP.
+- `POST /login` - Authenticate via username/password and receive a JWT.
+- `POST /logout` - Invalidate the current session.
+- `POST /auth/google` - Authenticate via Google OAuth token.
+- `POST /send-otp` - Trigger a password reset/verification OTP.
+- `POST /forgot-password` - Reset password using OTP.
+- `POST /change-password` - Update password while logged in.
+- `POST /edit` - Update user profile details.
+- `GET /:username` - Retrieve profile information of a specific user.
+- `POST /profile_picture` - Upload/update user profile picture (base64 encoded).
 
 </details>
 
-### Login `POST`
-
-    /api/users/login
-
-Use this route to make the user login.
-
 <details>
-  <summary>▶️ Example</summary>
+<summary><strong>Questions & Polls (/api/questions)</strong></summary>
 
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "username": "aromalanil",
-  "password": "Passw0rd1@3"
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "message": "Successfully Logged In"
-}
-```
+- `GET /` - Fetch paginated questions (supports filters like `following`, `topic`, `search`).
+- `POST /` - Create a new question/poll.
+- `GET /:id` - Fetch details of a specific question, including voting percentages.
+- `DELETE /:id` - Delete a question authored by the current user.
 
 </details>
 
-### Logout `POST`
-
-    /api/users/logout
-
-Use this route to logout the user
-
 <details>
-  <summary>▶️ Example</summary>
+<summary><strong>Topics (/api/topics)</strong></summary>
 
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "message": "Successfully Logged Out"
-}
-```
+- `GET /` - Fetch available topics (supports `count` and `search` parameters).
+- `GET /:id` - Get details of a single topic.
+- `POST /follow` - Follow an array of topics.
+- `POST /unfollow` - Unfollow an array of topics.
 
 </details>
 
-### Send OTP `POST`
-
-    /api/users/send-otp
-
-Verified users can use this send an OTP to their email. This OTP may be used for functions like change password etc
-
 <details>
-  <summary>▶️ Example</summary>
+<summary><strong>Opinions & Voting (/api/opinions)</strong></summary>
 
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "email": "aromalanilkannan@gmail.com"
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "message": "OTP send"
-}
-```
+- `GET /` - Fetch opinions for a specific `question_id`.
+- `POST /` - Post an opinion (vote/comment) on a question.
+- `POST /:id/upvote` - Upvote a specific opinion.
+- `DELETE /:id/upvote` - Remove an upvote.
+- `POST /:id/downvote` - Downvote a specific opinion.
+- `DELETE /:id/downvote` - Remove a downvote.
 
 </details>
 
-### Forgot Password `POST`
-
-    /api/users/forgot-password
-
-If you forgot your password, first generate an OTP (POST request to/users/send-otp). Then provide the new password along with the generated OTP to this route to change your password
-
 <details>
-  <summary>▶️ Example</summary>
+<summary><strong>Pictures (/api/pictures)</strong></summary>
 
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "otp": "678668",
-  "new_password": "1@qwerty",
-  "username": "aromalanil"
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "message": "Password changed successfully"
-}
-```
+- `GET /:id` - Retrieve a previously uploaded picture by ID.
 
 </details>
 
-### Change Password `POST`
+## 📜 License
 
-    /api/users/change-password
-
-Use this route to change your password. Provide your old password so that we can verify it's really you 😉
-
-<details>
-  <summary>▶️ Example</summary>
-  
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST  BODY 
-```json
-{
-    "old_password":"1@qwerty",
-    "new_password":"Passw0rd1@3"
-}
-```
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-```json
-{
-  "message": "Password changed successfully"
-}
-```
-</details>
-
-### Edit Details `POST`
-
-    /api/users/edit
-
-Logged in user can use this route to change their details.
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "first_name": "Tony"
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "User details updated successfully"
-}
-```
-
-</details>
-
-### Find Single User `GET`
-
-    /api/users/aromalanil
-
-Use this route to get details of a single user
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "User Found",
-  "data": {
-    "user": {
-      "_id": "608419f19c5d2720bc6118da",
-      "followed_topics": [],
-      "email": "aromalanilkannan@gmail.com",
-      "username": "aromalanil",
-      "last_name": "Anil",
-      "first_name": "Aromal",
-      "profile_picture": "https://avatar.oxro.io/avatar.png?name=Aromal&background=2D2D2D&caps=3"
-    }
-  }
-}
-```
-
-</details>
-
-### Google OAuth `POST`
-
-    /api/users/auth/google
-
-Use this route to register you as a new user/ login if you are an existing user
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "token": "<TOKEN GENERATED BY GOOGLE CLIENT>"
-}
-```
-
-</details>
-
-### Add Profile Picture `POST`
-
-    /api/users/profile_picture
-
-Update the profile picture of the user
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "image": "<Image as Base64 encoded string>"
-}
-```
-
-</details>
-
-## Question
-
-Every question related routes falls here
-
-### Create Question `POST`
-
-    /api/questions
-
-Logged in user can use this route to create a new question.
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-{
-  "title": "Who is best? Sachin or Dhoni?",
-  "content": "Even though this may seem like a silly question for many, I'm just curious to find out",
-  "topics": ["Cricket", "Celebrity"],
-  "options": ["Sachin", "Dhoni"]
-}
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Question successfully created"
-}
-```
-
-</details>
-
-### Find Questions `GET`
-
-    /api/questions
-
-Get questions posted, by default the latest question comes first
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Questions found",
-  "questions": [
-    {
-      "options": ["Sachin", "Dhoni"],
-      "opinions": [],
-      "topics": ["Cricket", "Celebrity"],
-      "_id": "6084240e4ec3ff27d2439a8e",
-      "title": "Who is best? Sachin or Dhoni?",
-      "author": "608419f19c5d2720bc6118da",
-      "content": "Even though this may seem like a silly question for many, I'm just curious to find out",
-      "created_at": "2021-04-24T13:58:38.152Z",
-      "__v": 0
-    }
-  ]
-}
-```
-
-#### PARAMETERS
-
-| Parameters | Description                                                                                   |
-| ---------- | --------------------------------------------------------------------------------------------- |
-| following  | Set this to true to show questions from the topics you follow (Only valid for Logged in user) |
-| topic      | Get topics which falls under this topic                                                       |
-| page_size  | Limit the number of entries in a response                                                     |
-| before_id  | Show questions posted after the question with this id                                         |
-| after_id   | Show questions posted before the question with this id                                        |
-| search     | Only include questions having this keyword in it's title/content                              |
-
-</details>
-
-### Find Single Question `GET`
-
-     /api/questions/6084240e4ec3ff27d2439a8e
-
-Find details of a single question using question ID
-
-- The result will also contain the percentages of each options based on the opinions received
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Question Found",
-  "question": {
-    "_id": "6084240e4ec3ff27d2439a8e",
-    "options": [
-      {
-        "option": "Sachin",
-        "percentage": 0
-      },
-      {
-        "option": "Dhoni",
-        "percentage": 0
-      }
-    ],
-    "opinions": [],
-    "topics": ["Cricket", "Celebrity"],
-    "title": "Who is best? Sachin or Dhoni?",
-    "author": "608419f19c5d2720bc6118da",
-    "content": "Even though this may seem like a silly question for many, I'm just curious to find out",
-    "created_at": "2021-04-24T13:58:38.152Z",
-    "__v": 0
-  }
-}
-```
-
-</details>
-
-### Remove Question `DEL`
-
-    /api/questions/6084280a8ab5f82bdb3bbb54
-
-The user can delete a question that they posted using this route
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Question deleted successfully"
-}
-```
-
-</details>
-
-## Topics
-
-Every topic related routes falls here
-
-### Get Topics `GET`
-
-    /api/topics
-
-Get details of topics
-
-<details>
-  <summary>▶️ Example</summary>
-
-#### PARAMETERS
-
-| Parameters | Description                                                                         |
-| ---------- | ----------------------------------------------------------------------------------- | --- |
-| count      | Set count to true to get the total number of questions posted under this topic      |     |
-| search     | Search for certain topics using search. Note: Search & count cannot be used at once |     |
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "topics": [
-    {
-      "_id": "608420c9d8d31f24dba51d13",
-      "name": "Cricket"
-    },
-    {
-      "_id": "608420c9d8d31f24dba51d14",
-      "name": "Tech"
-    },
-    {
-      "_id": "608420c9d8d31f24dba51d15",
-      "name": "Art"
-    },
-    {
-      "_id": "608420c9d8d31f24dba51d16",
-      "name": "Fiction"
-    },
-    {
-      "_id": "608420c9d8d31f24dba51d17",
-      "name": "Celebrity"
-    }
-  ]
-}
-```
-
-</details>
-
-### Follow Topic `POST`
-
-    /api/topics/follow
-
-Logged in user can use this route to follow a list of topics
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-'{
-    "topics":["Cricket","Fiction"]
-}'
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Updated followed topics successfully"
-}
-```
-
-</details>
-
-### Unfollow Topic `POST`
-
-    /api/topics/unfollow
-
-Logged in user can use this route to unfollow a list of topics
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
-'{
-    "topics":["Fiction"]
-}'
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Updated followed topics successfully"
-}
-```
-
-</details>
-
-### Get Single Topic `GET`
-
-    /api/topics/608420c9d8d31f24dba51d14
-
-The above route is used to get information of a single topic
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```javascript
-{
-  "msg": "Topic Found",
-  "data": {
-    "topic": {
-      "_id": "608420c9d8d31f24dba51d14",
-      "name": "Tech",
-      "created_at": "2021-04-24T13:44:41.620Z"
-    }
-  }
-}
-```
-
-</details>
-
-## Opinions
-
-Every opinion related routes falls here
-
-### Find Opinions `GET`
-
-    /api/opinions?question_id=607fbf0ca30d471a8e48b621
-
-<details>
-  <summary>▶️ Example</summary>
-
-#### PARAMETERS
-
-| Parameters  | Description              |
-| ----------- | ------------------------ |
-| question_id | 607fbf0ca30d471a8e48b621 |
-
-</details>
-
-### Create Opinion `POST`
-
-    /api/opinions/
-
-Use this route to add your opinion to a question
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://i.pinimg.com/originals/b0/88/54/b08854e2b29c5ee86876790884b406a9.gif" width="18" height="18" /> EXAMPLE REQUEST BODY
-
-```json
- '{
-    "question_id":"6084282a8ab5f82bdb3bbb55",
-    "content":"Sachin is the god of cricket",
-    "option":"Sachin"
-}'
-```
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Opinion created successfully",
-  "data": {
-    "opinion": {
-      "upvotes": ["608419f19c5d2720bc6118da"],
-      "downvotes": [],
-      "_id": "60842a368ab5f82bdb3bbb56",
-      "option": "Sachin",
-      "content": "Sachin is the god of cricket",
-      "question_id": "6084282a8ab5f82bdb3bbb55",
-      "author": "608419f19c5d2720bc6118da",
-      "created_at": "2021-04-24T14:24:54.539Z",
-      "__v": 0,
-      "upvote_count": 1,
-      "downvote_count": 0,
-      "id": "60842a368ab5f82bdb3bbb56"
-    }
-  }
-}
-```
-
-</details>
-
-### Add Upvote `POST`
-
-    /api/opinions/60842a368ab5f82bdb3bbb56/upvote
-
-Add upvote to an opinion
-
-- This will remove your downvote to the opinion, if it exist
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Upvote added successfully",
-  "data": {
-    "upvote_count": 1,
-    "downvote_count": 0
-  }
-}
-```
-
-</details>
-
-### Add Downvote `POST`
-
-    /api/opinions/60842a368ab5f82bdb3bbb56/downvote
-
-Add downvote to an opinion
-
-- This will remove your upvote to the opinion, if it exist
-
-### Remove Downvote `DEL`
-
-    /api/opinions/60842a368ab5f82bdb3bbb56/downvote
-
-Remove your downvote from an opinion
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Downvote removed successfully",
-  "data": {
-    "downvote_count": 0
-  }
-}
-```
-
-</details>
-
-### Remove Upvote `DEL`
-
-    /api/opinions/60842a368ab5f82bdb3bbb56/upvote
-
-Remove your upvote from an opinion
-
-<details>
-  <summary>▶️ Example</summary>
-
-##### <img src="https://socialinfluencerarmy.com/hosted/images/90/b13b70564011e8923bbfd19afa32a1/RedDownArrow.gif" width="12" height="12" /> EXAMPLE RESPONSE
-
-```json
-{
-  "msg": "Upvote removed successfully",
-  "data": {
-    "upvote_count": 0
-  }
-}
-```
-
-</details>
-
-## Pictures
-
-Every picture related routes falls here
-
-### Find Picture `GET`
-
-    /api/pictures/608428b8853d53307a7bc169
-
-Get picture based on the id
-
-## License
-
-This project is licensed under [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) - see the [`LICENSE`](https://github.com/aromalanil/polygram-backend/blob/main/LICENSE) file for details.
+This project is licensed under the [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) - see the [LICENSE](LICENSE) file for details.
