@@ -80,7 +80,7 @@ async function userSchemaPreSave() {
   }
 
   if (!this.profile_picture) {
-    this.profile_picture = `https://avatars.dicebear.com/api/bottts/${this.username}.svg`;
+    this.profile_picture = `https://api.dicebear.com/10.x/dylan/svg?seed=${this.username}`
   }
 }
 
